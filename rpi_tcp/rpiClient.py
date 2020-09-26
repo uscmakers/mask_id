@@ -15,6 +15,7 @@ def Main():
     """127.0.0.1 is the loopback address. Any packets sent to this address will
     essentially loop right back to your machine and look for any process 
     listening in on the port specified."""
+    # Replace host and port with host and port of Arduino
     host = '127.0.0.1'
     port = 5000
 

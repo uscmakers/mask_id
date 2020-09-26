@@ -4,6 +4,7 @@ https://www.youtube.com/watch?v=bTThyxVy7Sk&index=6&list=PL1A2CSdiySGIPxpSlgzsZi
 import socket
 
 def Main():
+    # Replace host and port with host and port of RPi
     host = '127.0.0.1'
     port = 5000
 
