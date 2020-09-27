@@ -3,12 +3,12 @@
 #include "arduino_secrets.h" // Create an arduino_secrets.h file and define the SECRET_SSID and SECRET_PASS
 // with the WiFi properties of the network
 
-char ssid[] = SECRET_SSID; // your network SSID (name)
-char pass[] = SECRET_PASS; // your network password (use for WPA, or use as key for WEP)
+char ssid[] = ""; // your network SSID (name)
+char pass[] = ""; // your network password (use for WPA, or use as key for WEP)
 
 // Replace host and port with host and port of RPi
-const char * host = "192.168.1.83";
-const uint16_t port = 8090;
+const char * host = "192.168.1.219";
+const uint16_t port = 5000;
 
 int status = WL_IDLE_STATUS;
 
