@@ -5,7 +5,7 @@ import socket
 
 def Main():
     # Replace host and port with host and port of RPi
-    host = '127.0.0.1'
+    host = '192.168.1.219'
     port = 5000
 
     s = socket.socket()
