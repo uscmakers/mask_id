@@ -11,7 +11,7 @@ void setup() {
 
 void loop() {
   // put your main code here, to run repeatedly:
-  for(angle = 10; angle < 270; angle++)  
+  for(angle = 10; angle < 180; angle++)  
   {                                  
     servo.write(angle);               
     delay(15);                   
