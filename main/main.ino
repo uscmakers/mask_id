@@ -1,7 +1,8 @@
 #include <SPI.h>
 #include <WiFiNINA.h>
-#include "arduino_secrets.h" // Create an arduino_secrets.h file and define the SECRET_SSID and SECRET_PASS
+//#include "arduino_secrets.h" // Create an arduino_secrets.h file and define the SECRET_SSID and SECRET_PASS
 // with the WiFi properties of the network
+#include <Servo.h>
 
 char ssid[] = ""; // your network SSID (name)
 char pass[] = ""; // your network password (use for WPA, or use as key for WEP)
@@ -103,17 +104,64 @@ void wifiLoop() {
   }
 }
 
-void setup()
-{
+const int pinSwitch = 12;  //Pin Reed
+const int pinLed    = 9;  //Pin LED
+int StatoSwitch = 0;
 
-  Serial.begin(9600);
-  while (!Serial) {} // Wait for serial port to connect. Needed for native USB port only.
-
+void reedSwitchSetup() {
+  pinMode(pinLed, OUTPUT);      //Imposto i PIN
+  pinMode(pinSwitch, INPUT);
 }
 
-void loop()
+void reedSwitchLoop()
 {
+  StatoSwitch = digitalRead(pinSwitch);  //Leggo il valore del Reed
+  if (StatoSwitch == HIGH)
+  {
+    digitalWrite(pinLed, HIGH);
+  }
+  else
+  {
+    digitalWrite(pinLed, LOW);
+  }
+}
 
+Servo servo;
+int angle = 0;
+
+void servoSetup() {
+  // put your setup code here, to run once:
+  servo.attach(7);
+  servo.write(angle);
+}
+
+void servoLoop() {
+  // put your main code here, to run repeatedly:
+  for(angle = 10; angle < 180; angle++)  
+  {                                  
+    servo.write(angle);               
+    delay(15);                   
+  } 
+  // now scan back from 180 to 0 degrees
+  for(angle = 180; angle > 10; angle--)    
+  {                                
+    servo.write(angle);           
+    delay(15);       
+  }
+}
+
+void setup() {
+  // put your setup code here, to run once:
+  wifiSetup();
+  reedSwitchSetup();
+  servoSetup();
+}
+
+void loop() {
+  // put your main code here, to run repeatedly:
+  wifiLoop();
+  reedSwitchLoop();
+  servoLoop();
 }
 
 void printWifiStatus() {

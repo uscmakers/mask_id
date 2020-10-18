@@ -6,12 +6,13 @@
 const int pinSwitch = 12;  //Pin Reed
 const int pinLed    = 9;  //Pin LED
 int StatoSwitch = 0;
-void setup()
-{
+
+void reedSwitchSetup() {
   pinMode(pinLed, OUTPUT);      //Imposto i PIN
   pinMode(pinSwitch, INPUT);
 }
-void loop()
+
+void reedSwitchLoop()
 {
   StatoSwitch = digitalRead(pinSwitch);  //Leggo il valore del Reed
   if (StatoSwitch == HIGH)
