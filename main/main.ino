@@ -4,6 +4,8 @@
 // with the WiFi properties of the network
 #include <Servo.h>
 
+int mask_flag = 0;
+int lock_flag = 1;
 char ssid[] = ""; // your network SSID (name)
 char pass[] = ""; // your network password (use for WPA, or use as key for WEP)
 
@@ -74,22 +76,26 @@ void wifiLoop() {
   // if there are incoming bytes available
 
   // from the server, read them and print them:
-
+  String message = "";
   while (client.available()) {
 
     char c = client.read();
-
+    message = message + c; 
     Serial.write(c);
+
 
   }
 
-  if (client.connected()) {
+  if (message  == "ON"){
+    mask_flag = 1;
+  }
+  else if(message == "OFF"){
+    mask_flag = 0;
+  }
+
+  if (!client.connected()) {
     
-    client.println("Sending message from client");
-    
-    delay(10000);
-    
-  } else { // if the server's disconnected, stop the client:
+  // if the server's disconnected, stop the client:
 
     Serial.println();
 
@@ -136,7 +142,19 @@ void servoSetup() {
 }
 
 void servoLoop() {
+  StatoSwitch = digitalRead(pinSwitch);
   // put your main code here, to run repeatedly:
+  if (mask_flag == 1){
+    if(StatoSwitch == HIGH){
+      for(angle = 10; angle < 180; angle++) {                                  
+        servo.write(angle);               
+        delay(15);                   
+       } 
+    }
+    mask_flag = 0;
+  }
+  
+  
   for(angle = 10; angle < 180; angle++)  
   {                                  
     servo.write(angle);               
