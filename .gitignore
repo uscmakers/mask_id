@@ -1,3 +1,5 @@
 arduinoServer/arduino_secrets.h
 arduinoClient/arduino_secrets.h
 arduino_secrets.h
+.DS_Store 
+
