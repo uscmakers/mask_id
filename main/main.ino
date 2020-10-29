@@ -144,7 +144,7 @@ void servoSetup() {
 void servoLoop() {
   StatoSwitch = digitalRead(pinSwitch);
   // put your main code here, to run repeatedly:
-  if (mask_flag == 1){
+  if (mask_flag == 1 && lock_flag == 1){
     if(StatoSwitch == HIGH){
       for(angle = 10; angle < 180; angle++) {                                  
         servo.write(angle);               
@@ -153,19 +153,29 @@ void servoLoop() {
     }
     mask_flag = 0;
   }
-  
-  
-  for(angle = 10; angle < 180; angle++)  
-  {                                  
-    servo.write(angle);               
-    delay(15);                   
-  } 
-  // now scan back from 180 to 0 degrees
-  for(angle = 180; angle > 10; angle--)    
-  {                                
-    servo.write(angle);           
-    delay(15);       
+  // check if the door is unlocked and door is closed
+  // then lock the lock
+  else if(lock_flag == 0 && StatoSwitch == HIGH){
+    // now scan back from 180 to 0 degrees
+    for(angle = 180; angle > 10; angle--){                                
+      servo.write(angle);           
+      delay(15);       
+    }
+    //maybe add alarm if door is left open 
+    
   }
+//  
+//  for(angle = 10; angle < 180; angle++)  
+//  {                                  
+//    servo.write(angle);               
+//    delay(15);                   
+//  } 
+//  // now scan back from 180 to 0 degrees
+//  for(angle = 180; angle > 10; angle--)    
+//  {                                
+//    servo.write(angle);           
+//    delay(15);       
+//  }
 }
 
 void setup() {
