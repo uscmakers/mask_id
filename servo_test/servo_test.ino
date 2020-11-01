@@ -3,13 +3,13 @@
 Servo servo;
 int angle = 0;
 
-void servoSetup() {
+void setup() {
   // put your setup code here, to run once:
   servo.attach(7);
   servo.write(angle);
 }
 
-void servoLoop() {
+void loop() {
   // put your main code here, to run repeatedly:
   for(angle = 10; angle < 180; angle++)  
   {                                  

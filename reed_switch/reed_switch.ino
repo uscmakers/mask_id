@@ -7,19 +7,20 @@ const int pinSwitch = 12;  //Pin Reed
 const int pinLed    = 9;  //Pin LED
 int StatoSwitch = 0;
 
-void reedSwitchSetup() {
+void setup() {
   pinMode(pinLed, OUTPUT);      //Imposto i PIN
   pinMode(pinSwitch, INPUT);
 }
 
-void reedSwitchLoop()
+void loop()
 {
-  StatoSwitch = digitalRead(pinSwitch);  //Leggo il valore del Reed
+  StatoSwitch = digitalRead(pinSwitch);//Leggo il valore del Reed
+  Serial.print(StatoSwitch);
   if (StatoSwitch == HIGH)
   {
     digitalWrite(pinLed, HIGH);
   }
-  else
+  else if(StatoSwitch == LOW)
   {
     digitalWrite(pinLed, LOW);
   }
