@@ -17,6 +17,9 @@ int status = WL_IDLE_STATUS;
 const int pinSwitch = 12;  //Pin Reed
 const int pinLed    = 9;  //Pin LED
 int StatoSwitch = 0;
+const int REED_PIN = 2; // Pin connected to reed switch
+const int LED_PIN = 13; // LED pin - active-high
+
 
 
 WiFiClient client;
@@ -24,7 +27,7 @@ WiFiClient client;
 void setup() {
   // put your setup code here, to run once:
   //wifiSetup();
-  reedSwitchSetup();
+  reedSwitch_setup() 
   servoSetup();
   mask_flag = 1;
   lock_flag = 1; 
@@ -33,8 +36,9 @@ void setup() {
 void loop() {
   // put your main code here, to run repeatedly:
 //  wifiLoop();
-  reedSwitchLoop();
-  servoLoop();
+  
+  prox = reed_loop() 
+  servoLoop(prox);
 }
 
 
@@ -137,23 +141,38 @@ void wifiLoop() {
 
 
 
-void reedSwitchSetup() {
-  pinMode(pinLed, OUTPUT);      //Imposto i PIN
-  pinMode(pinSwitch, INPUT);
+https://learn.sparkfun.com/tutorials/reed-switch-hookup-guide/all
+void reedSwitch_setup() 
+{
+  // Since the other end of the reed switch is connected to ground, we need
+  // to pull-up the reed switch pin internally.
+  pinMode(REED_PIN, INPUT_PULLUP);
+  pinMode(LED_PIN, OUTPUT);
 }
 
-void reedSwitchLoop()
+int reed_loop() 
 {
-  StatoSwitch = digitalRead(pinSwitch);  //Leggo il valore del Reed
-  if (StatoSwitch == HIGH)
+  int proximity = digitalRead(REED_PIN); // Read the state of the switch
+  if (proximity == LOW) // If the pin reads low, the switch is closed.
   {
-    digitalWrite(pinLed, HIGH);
+    Serial.println("Switch closed");
+    delay(1000);
+   
   }
   else
   {
-    digitalWrite(pinLed, LOW);
+    Serial.println("switch open");
+    delay(1000);
+
   }
+
+  return proximity;
 }
+
+
+
+
+
 
 Servo servo;
 int angle = 0;
@@ -165,8 +184,7 @@ void servoSetup() {
  
 }
 
-void servoLoop() {
-  StatoSwitch = digitalRead(pinSwitch);
+void servoLoop(int proximity) {
   // put your main code here, to run repeatedly:
   Serial.println(mask_flag);
   Serial.println(lock_flag);
@@ -175,7 +193,7 @@ void servoLoop() {
     Serial.println("mask on door locked");
     Serial.println(StatoSwitch);
     delay(1000);
-    if(StatoSwitch == LOW){
+    if(proximity == LOW){
       Serial.print("lock open");
       for(angle = 10; angle < 180; angle++) {                                  
         servo.write(angle);               
@@ -186,7 +204,7 @@ void servoLoop() {
   }
   // check if the door is unlocked and door is closed
   // then lock the lock
-  else if(lock_flag == 0 && StatoSwitch == LOW){
+  else if(lock_flag == 0 && proximity == LOW){
     // now scan back from 180 to 0 degrees
     Serial.print("lock closed");
     for(angle = 180; angle > 10; angle--){                                
