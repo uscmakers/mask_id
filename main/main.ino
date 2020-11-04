@@ -10,7 +10,7 @@ char ssid[] = "ATT8T56pbr 2.4ghz"; // your network SSID (name)
 char pass[] = "7emn9+bq9kab"; // your network password (use for WPA, or use as key for WEP)
 
 // Replace host and port with host and port of RPi
-const char * host = "192.168.1.219";
+const char * host = "192.168.1.101";
 const uint16_t port = 5000;
 String message = "ON";
 int status = WL_IDLE_STATUS;
@@ -26,8 +26,8 @@ WiFiClient client;
 
 void setup() {
   // put your setup code here, to run once:
-  //wifiSetup();
-  reedSwitch_setup() 
+  wifiSetup();
+  //reedSwitch_setup() 
   servoSetup();
   mask_flag = 1;
   lock_flag = 1; 
@@ -35,10 +35,10 @@ void setup() {
 
 void loop() {
   // put your main code here, to run repeatedly:
-//  wifiLoop();
+  wifiLoop();
   
-  prox = reed_loop() 
-  servoLoop(prox);
+//  prox = reed_loop() 
+//  servoLoop(prox);
 }
 
 
@@ -113,14 +113,14 @@ void wifiLoop() {
 
   }
   
-  if (message  == "ON"){
-    mask_flag = 1;
-    message = "OFF";
-    
-  }
-  else if(message == "OFF"){
-    mask_flag = 0;
-  }
+//  if (message  == "ON"){
+//    mask_flag = 1;
+//    message = "OFF";
+//    
+//  }
+//  else if(message == "OFF"){
+//    mask_flag = 0;
+//  }
 
   if (!client.connected()) {
     
@@ -141,7 +141,7 @@ void wifiLoop() {
 
 
 
-https://learn.sparkfun.com/tutorials/reed-switch-hookup-guide/all
+//https://learn.sparkfun.com/tutorials/reed-switch-hookup-guide/all
 void reedSwitch_setup() 
 {
   // Since the other end of the reed switch is connected to ground, we need
