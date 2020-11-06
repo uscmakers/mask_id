@@ -26,114 +26,114 @@ GPIO.setup(23, GPIO.IN, pull_up_down=GPIO.PUD_UP)
 # now the program will do nothing until the signal on port 23   
 # starts to fall towards zero. This is why we used the pullup  
 # to keep the signal high and prevent a false interrupt   
-try:  
+try:
     GPIO.wait_for_edge(23, GPIO.FALLING)
-	flag = 1  
+    flag = 1  
     
 except KeyboardInterrupt:  
     GPIO.cleanup()       # clean up GPIO on CTRL+C exit  
 #GPIO.cleanup()   
 
 def detect_and_predict_mask(frame, faceNet, maskNet):
-	# grab the dimensions of the frame and then construct a blob
-	# from it
-	(h, w) = frame.shape[:2]
-	blob = cv2.dnn.blobFromImage(frame, 1.0, (300, 300),
-		(104.0, 177.0, 123.0))
+    # grab the dimensions of the frame and then construct a blob
+    # from it
+    (h, w) = frame.shape[:2]
+    blob = cv2.dnn.blobFromImage(frame, 1.0, (300, 300),
+        (104.0, 177.0, 123.0))
 
-	# pass the blob through the network and obtain the face detections
-	faceNet.setInput(blob)
-	detections = faceNet.forward()
+    # pass the blob through the network and obtain the face detections
+    faceNet.setInput(blob)
+    detections = faceNet.forward()
 
-	# initialize our list of faces, their corresponding locations,
-	# and the list of predictions from our face mask network
-	faces = []
-	locs = []
-	preds = []
+    # initialize our list of faces, their corresponding locations,
+    # and the list of predictions from our face mask network
+    faces = []
+    locs = []
+    preds = []
 
-	# loop over the detections
-	for i in range(0, detections.shape[2]):
-		# extract the confidence (i.e., probability) associated with
-		# the detection
-		confidence = detections[0, 0, i, 2]
+    # loop over the detections
+    for i in range(0, detections.shape[2]):
+        # extract the confidence (i.e., probability) associated with
+        # the detection
+        confidence = detections[0, 0, i, 2]
 
-		# filter out weak detections by ensuring the confidence is
-		# greater than the minimum confidence
-		if confidence > args["confidence"]:
-			# compute the (x, y)-coordinates of the bounding box for
-			# the object
-			box = detections[0, 0, i, 3:7] * np.array([w, h, w, h])
-			(startX, startY, endX, endY) = box.astype("int")
+        # filter out weak detections by ensuring the confidence is
+        # greater than the minimum confidence
+        if confidence > args["confidence"]:
+            # compute the (x, y)-coordinates of the bounding box for
+            # the object
+            box = detections[0, 0, i, 3:7] * np.array([w, h, w, h])
+            (startX, startY, endX, endY) = box.astype("int")
 
-			# ensure the bounding boxes fall within the dimensions of
-			# the frame
-			(startX, startY) = (max(0, startX), max(0, startY))
-			(endX, endY) = (min(w - 1, endX), min(h - 1, endY))
+            # ensure the bounding boxes fall within the dimensions of
+            # the frame
+            (startX, startY) = (max(0, startX), max(0, startY))
+            (endX, endY) = (min(w - 1, endX), min(h - 1, endY))
 
-			# extract the face ROI, convert it from BGR to RGB channel
-			# ordering, resize it to 224x224, and preprocess it
-			face = frame[startY:endY, startX:endX]
-			face = cv2.cvtColor(face, cv2.COLOR_BGR2RGB)
-			face = cv2.resize(face, (224, 224))
-			face = img_to_array(face)
-			face = preprocess_input(face)
+            # extract the face ROI, convert it from BGR to RGB channel
+            # ordering, resize it to 224x224, and preprocess it
+            face = frame[startY:endY, startX:endX]
+            face = cv2.cvtColor(face, cv2.COLOR_BGR2RGB)
+            face = cv2.resize(face, (224, 224))
+            face = img_to_array(face)
+            face = preprocess_input(face)
 
-			# add the face and bounding boxes to their respective
-			# lists
-			faces.append(face)
-			locs.append((startX, startY, endX, endY))
+            # add the face and bounding boxes to their respective
+            # lists
+            faces.append(face)
+            locs.append((startX, startY, endX, endY))
 
-	# only make a predictions if at least one face was detected
-	if len(faces) > 0:
-		# for faster inference we'll make batch predictions on *all*
-		# faces at the same time rather than one-by-one predictions
-		# in the above `for` loop
-		faces = np.array(faces, dtype="float32")
-		preds = maskNet.predict(faces, batch_size=32)
+    # only make a predictions if at least one face was detected
+    if len(faces) > 0:
+        # for faster inference we'll make batch predictions on *all*
+        # faces at the same time rather than one-by-one predictions
+        # in the above `for` loop
+        faces = np.array(faces, dtype="float32")
+        preds = maskNet.predict(faces, batch_size=32)
 
-	# return a 2-tuple of the face locations and their corresponding
-	# locations
-	return (locs, preds)
+    # return a 2-tuple of the face locations and their corresponding
+    # locations
+    return (locs, preds)
 
-def send_data(data):
-	# Replace host and port with host and port of RPi
-    host = '192.168.1.101'
-    port = 5000
+# def send_data(data):
+#     # Replace host and port with host and port of RPi
+#     host = '192.168.1.101'
+#     port = 5000
 
-    s = socket.socket()
-    s.bind((host,port))
+#     s = socket.socket()
+#     s.bind((host,port))
 
-    print('Binded to ' + str(host) + ' ' + str(port))
-    s.listen(1)
-    c, addr = s.accept()
-    print("Connection from: " + str(addr))
-    while True:
-        # data = c.recv(1024).decode('utf-8')
-        # if not data:
-        #     break
-        # print("From connected user: " + data)
-        # data = data.upper()
-        # print("Sending: " + data)
-        c.send(data.encode('utf-8'))
-    c.close()
+#     print('Binded to ' + str(host) + ' ' + str(port))
+#     s.listen(1)
+#     c, addr = s.accept()
+#     print("Connection from: " + str(addr))
+#     while True:
+#         # data = c.recv(1024).decode('utf-8')
+#         # if not data:
+#         #     break
+#         # print("From connected user: " + data)
+#         # data = data.upper()
+#         # print("Sending: " + data)
+#         c.send(data.encode('utf-8'))
+#     c.close()
 
 # construct the argument parser and parse the arguments
 ap = argparse.ArgumentParser()
 ap.add_argument("-f", "--face", type=str,
-	default="face_detector",
-	help="path to face detector model directory")
+    default="face_detector",
+    help="path to face detector model directory")
 ap.add_argument("-m", "--model", type=str,
-	default="mask_detector.model",
-	help="path to trained face mask detector model")
+    default="mask_detector.model",
+    help="path to trained face mask detector model")
 ap.add_argument("-c", "--confidence", type=float, default=0.5,
-	help="minimum probability to filter weak detections")
+    help="minimum probability to filter weak detections")
 args = vars(ap.parse_args())
 
 # load our serialized face detector model from disk
 print("[INFO] loading face detector model...")
 prototxtPath = os.path.sep.join([args["face"], "deploy.prototxt"])
 weightsPath = os.path.sep.join([args["face"],
-	"res10_300x300_ssd_iter_140000.caffemodel"])
+    "res10_300x300_ssd_iter_140000.caffemodel"])
 faceNet = cv2.dnn.readNet(prototxtPath, weightsPath)
 
 # load the face mask detector model from disk
@@ -151,89 +151,89 @@ maskcount = 0
 nomaskcount = 0
 
 while True:
-	# loop over the frames from the video stream
-	if flag = 1:
-		# initialize the video stream and allow the camera sensor to warm up
-		print("[INFO] starting video stream...")
-		vs = VideoStream(src=0).start()
-		time.sleep(2.0)
-	while flag:
-		# grab the frame from the threaded video stream and resize it
-		# to have a maximum width of 400 pixels
-		frame = vs.read()
-		frame = imutils.resize(frame, width=400)
+    # loop over the frames from the video stream
+    if flag == 1:
+        # initialize the video stream and allow the camera sensor to warm up
+        print("[INFO] starting video stream...")
+        vs = VideoStream(src=0).start()
+        time.sleep(2.0)
+    while flag:
+        # grab the frame from the threaded video stream and resize it
+        # to have a maximum width of 400 pixels
+        frame = vs.read()
+        frame = imutils.resize(frame, width=400)
 
-		#################################### NEW
-		allMask = True
-		numfaces = []
+        #################################### NEW
+        allMask = True
+        numfaces = []
 
-		# detect faces in the frame and determine if they are wearing a
-		# face mask or not
-		(locs, preds) = detect_and_predict_mask(frame, faceNet, maskNet)
+        # detect faces in the frame and determine if they are wearing a
+        # face mask or not
+        (locs, preds) = detect_and_predict_mask(frame, faceNet, maskNet)
 
-		# loop over the detected face locations and their corresponding
-		# locations
-		for (box, pred) in zip(locs, preds):
-			# unpack the bounding box and predictions
-			(startX, startY, endX, endY) = box
-			(mask, withoutMask) = pred
+        # loop over the detected face locations and their corresponding
+        # locations
+        for (box, pred) in zip(locs, preds):
+            # unpack the bounding box and predictions
+            (startX, startY, endX, endY) = box
+            (mask, withoutMask) = pred
 
-			# determine the class label and color we'll use to draw
-			# the bounding box and text
-			label = "Mask" if mask > withoutMask else "No Mask"
-			color = (0, 255, 0) if label == "Mask" else (0, 0, 255)
+            # determine the class label and color we'll use to draw
+            # the bounding box and text
+            label = "Mask" if mask > withoutMask else "No Mask"
+            color = (0, 255, 0) if label == "Mask" else (0, 0, 255)
 
-			######################### NEW
-			if label == "No Mask":
-				allMask = False
-				
+            ######################### NEW
+            if label == "No Mask":
+                allMask = False
+                
 
-			# include the probability in the label
-			label = "{}: {:.2f}%".format(label, max(mask, withoutMask) * 100)
+            # include the probability in the label
+            label = "{}: {:.2f}%".format(label, max(mask, withoutMask) * 100)
 
-			# display the label and bounding box rectangle on the output
-			# frame
-			cv2.putText(frame, label, (startX, startY - 10),
-				cv2.FONT_HERSHEY_SIMPLEX, 0.45, color, 2)
-			cv2.rectangle(frame, (startX, startY), (endX, endY), color, 2)
+            # display the label and bounding box rectangle on the output
+            # frame
+            cv2.putText(frame, label, (startX, startY - 10),
+                cv2.FONT_HERSHEY_SIMPLEX, 0.45, color, 2)
+            cv2.rectangle(frame, (startX, startY), (endX, endY), color, 2)
 
-		####################################### NEW
+        ####################################### NEW
 
-		if i == 30:
-			if allMask == True:
-				rpi_data.append(1)
-				maskcount = maskcount + 1
-			else:
-				rpi_data.append(0)
-				nomaskcount = nomaskcount + 1
-			i = 0
+        if i == 30:
+            if allMask == True:
+                rpi_data.append(1)
+                maskcount = maskcount + 1
+            else:
+                rpi_data.append(0)
+                nomaskcount = nomaskcount + 1
+            i = 0
 
-		i = i+1
+        i = i+1
 
-		if len(rpi_data) == 10:
-			print(rpi_data) #included this to make sure logic works
-			if maskcount > nomaskcount:
-				print("Mask")
-				send_data("Mask")
-			else:
-				print("No Mask")
-				send_data("No Mask")
-			maskcount = 0
-			nomaskcount = 0
-			rpi_data.clear()
-			flag = 0
+        if len(rpi_data) == 10:
+            print(rpi_data) #included this to make sure logic works
+            if maskcount > nomaskcount:
+                print("Mask")
+                send_data("Mask")
+            else:
+                print("No Mask")
+                send_data("No Mask")
+            maskcount = 0
+            nomaskcount = 0
+            rpi_data.clear()
+            flag = 0
 
-		
+        
 
-		##########################################
+        ##########################################
 
-		# show the output frame
-		cv2.imshow("Frame", frame)
-		key = cv2.waitKey(1) & 0xFF
+        # show the output frame
+        cv2.imshow("Frame", frame)
+        key = cv2.waitKey(1) & 0xFF
 
-		# if the `q` key was pressed, break from the loop
-		if key == ord("q"):
-			break
+        # if the `q` key was pressed, break from the loop
+        if key == ord("q"):
+            break
 
 
 # do a bit of cleanup
