@@ -1,9 +1,10 @@
 #include <SPI.h>
 #include <WiFiNINA.h>
-//#include "arduino_secrets.h" // Create an arduino_secrets.h file and define the SECRET_SSID and SECRET_PASS
-// with the WiFi properties of the network
+//#include "arduino_secrets.h" // Create an arduino_secrets.h file and define the SECRET_SSID and SECRET_PASS with the WiFi properties of the network
 #include <Servo.h>
+
 Servo servo;
+WiFiClient client;
 int mask_flag = 1;
 int lock_flag = 1;
 int prox = 0;
@@ -20,101 +21,60 @@ int StatoSwitch = 0;
 const int REED_PIN = 11; // Pin connected to reed switch
 int angle = 0;
 
-
-
-WiFiClient client;
-
 void setup() {
-  // put your setup code here, to run once:
   //wifiSetup();
-  reedSwitch_setup();
-  servoSetup();
-  
+  /* Reed Switch Setup */
+  // Since the other end of the reed switch is connected to ground, we need
+  // to pull-up the reed switch pin internally.
+  pinMode(REED_PIN, INPUT_PULLUP);
+  pinMode(LED_PIN, OUTPUT);
+  /* Servo Setup */
+  servo.attach(7);
+  servo.write(angle);
 }
 
 void loop() {
-  // put your main code here, to run repeatedly:
   //wifiLoop();
-  prox = reed_loop();
-//  Serial.println("Prox");
-//  Serial.println(prox);
-  servoLoop(prox);
-
-  
+  reed_loop();
+  servoLoop();
 }
 
-
-
-
-
-
 void wifiSetup() {
-    // check for the WiFi module:
-
+  // check for the WiFi module:
   if (WiFi.status() == WL_NO_MODULE) {
-
     Serial.println("Communication with WiFi module failed!");
-
     // don't continue
-
     while (true);
-
   }
-
   String fv = WiFi.firmwareVersion();
-
   if (fv < WIFI_FIRMWARE_LATEST_VERSION) {
-
     Serial.println("Please upgrade the firmware");
-
   }
-
   // attempt to connect to Wifi network:
-
   while (status != WL_CONNECTED) {
-
     Serial.print("Attempting to connect to SSID: ");
-
     Serial.println(ssid);
-
     // Connect to WPA/WPA2 network. Change this line if using open or WEP network:
-
     status = WiFi.begin(ssid, pass);
-
     // wait 10 seconds for connection:
-
     delay(10000);
-
   }
-
   Serial.println("Connected to wifi");
-
   printWifiStatus();
-
   Serial.println("\nStarting connection to server...");
-
   // if you get a connection, report back via serial:
-
   if (client.connect(host, port)) {
-    
     Serial.println("connected to server");
-    
   }
 }
 
 void wifiLoop() {
-      
-  // if there are incoming bytes available
-
-  // from the server, read them and print them:
+  // if there are incoming bytes available from the server, read them and print them:
   while (client.available()) {
-
     char c = client.read();
     message = message + c; 
     Serial.write(c);
-
   }
-  
 //  if (message  == "ON"){
 //    mask_flag = 1;
 //    message = "OFF";
@@ -123,93 +83,50 @@ void wifiLoop() {
 //  else if(message == "OFF"){
 //    mask_flag = 0;
 //  }
-
   if (!client.connected()) {
-    
-  // if the server's disconnected, stop the client:
-
+    // if the server's disconnected, stop the client:
     Serial.println();
-
     Serial.println("disconnecting from server.");
-
     client.stop();
-
     // do nothing forevermore:
-
     while (true);
-
   }
-}
-
-
-
-//https://learn.sparkfun.com/tutorials/reed-switch-hookup-guide/all
-void reedSwitch_setup() 
-{
-  // Since the other end of the reed switch is connected to ground, we need
-  // to pull-up the reed switch pin internally.
-  pinMode(REED_PIN, INPUT_PULLUP);
-  pinMode(LED_PIN, OUTPUT);
 }
 
 int reed_loop() 
 {
-  int proximity = digitalRead(REED_PIN); // Read the state of the switch
-  if (proximity == LOW) // If the pin reads low, the switch is closed.
+  prox = digitalRead(REED_PIN); // Read the state of the switch
+  if (prox == LOW) // If the pin reads low, the switch is closed.
   {
     digitalWrite(LED_PIN, HIGH); // Turn the LED on
     delay(1000);
-   
   }
-  else if(proximity == HIGH)
+  else if(prox == HIGH)
   {
     digitalWrite(LED_PIN, LOW); // Turn the LED on
     delay(1000);
-
   }
-
-  Serial.println("Prox");
-  Serial.println(proximity);
-
-  return proximity;
 }
 
-
-
-
-
-
-
-
-void servoSetup() {
-  // put your setup code here, to run once:
-  servo.attach(7);
-  servo.write(angle);
- 
-}
-
-void servoLoop(int proximity) {
+void servoLoop() {
   // put your main code here, to run repeatedly:
   Serial.println(mask_flag);
   Serial.println(lock_flag);
   delay(1000);
-  if (mask_flag == 1 && lock_flag == 1 && proximity == LOW){
+  if (mask_flag == 1 && lock_flag == 1 && prox == LOW){
     Serial.println("mask on");
     Serial.println("unlock door");
     for(angle = 0; angle < 80; angle++) {                                  
         servo.write(angle);               
         delay(15);                   
-    } 
-    
+    }
     lock_flag = 0;
     delay(5000);
   }
-  // check if the door is unlocked and door is closed
-  // then lock the lock
-  
-  else if(lock_flag == 0 && proximity == LOW){
-    // now scan back from 180 to 0 degrees
-     Serial.println("lock door ");
+  // check if the door is unlocked and door is closed, then lock the lock
+  else if(lock_flag == 0 && prox == LOW){
+    // now scan back from 80 to 0 degrees
+    Serial.println("lock door ");
     for(angle = 80; angle > 0; angle--){                                
       servo.write(angle);           
       delay(15);       
@@ -217,44 +134,19 @@ void servoLoop(int proximity) {
     //maybe add alarm if door is left open 
     lock_flag =1;
   }
-//  
-//  for(angle = 10; angle < 180; angle++)  
-//  {                                  
-//    servo.write(angle);               
-//    delay(15);                   
-//  } 
-//  // now scan back from 180 to 0 degrees
-//  for(angle = 180; angle > 10; angle--)    
-//  {                                
-//    servo.write(angle);           
-//    delay(15);       
-//  }
 }
 
-
 void printWifiStatus() {
-
   // print the SSID of the network you're attached to:
-
   Serial.print("SSID: ");
-
   Serial.println(WiFi.SSID());
-
   // print your board's IP address:
-
   IPAddress ip = WiFi.localIP();
-
   Serial.print("IP Address: ");
-
   Serial.println(ip);
-
   // print the received signal strength:
-
   long rssi = WiFi.RSSI();
-
   Serial.print("signal strength (RSSI):");
-
   Serial.print(rssi);
-
   Serial.println(" dBm");
 }
