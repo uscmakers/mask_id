@@ -36,7 +36,8 @@ void loop() {
   // put your main code here, to run repeatedly:
   //wifiLoop();
   prox = reed_loop();
-  //Serial.println(prox);
+//  Serial.println("Prox");
+//  Serial.println(prox);
   servoLoop(prox);
 
   
@@ -167,6 +168,9 @@ int reed_loop()
 
   }
 
+  Serial.println("Prox");
+  Serial.println(proximity);
+
   return proximity;
 }
 
@@ -192,7 +196,7 @@ void servoLoop(int proximity) {
   if (mask_flag == 1 && lock_flag == 1 && proximity == LOW){
     Serial.println("mask on");
     Serial.println("unlock door");
-    for(angle = 10; angle < 180; angle++) {                                  
+    for(angle = 0; angle < 80; angle++) {                                  
         servo.write(angle);               
         delay(15);                   
     } 
@@ -206,7 +210,7 @@ void servoLoop(int proximity) {
   else if(lock_flag == 0 && proximity == LOW){
     // now scan back from 180 to 0 degrees
      Serial.println("lock door ");
-    for(angle = 180; angle > 10; angle--){                                
+    for(angle = 80; angle > 0; angle--){                                
       servo.write(angle);           
       delay(15);       
     }
