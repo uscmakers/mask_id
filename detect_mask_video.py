@@ -14,6 +14,9 @@ import cv2
 import os
 import socket
 
+from picamera.array import PiRGBArray
+from picamera import PiCamera
+
 import RPi.GPIO as GPIO  
 
 flag = -1
@@ -155,12 +158,22 @@ while True:
     if flag == 1:
         # initialize the video stream and allow the camera sensor to warm up
         print("[INFO] starting video stream...")
-        vs = VideoStream(src=0).start()
+        # vs = VideoStream(src=0).start()
+        # time.sleep(2.0)
+        camera = PiCamera()
+        camera.resolution = (640, 480)
+        camera.framerate = 32
+        rawCapture = PiRGBArray(camera, size=(640, 480))
         time.sleep(2.0)
+        
     while flag:
         # grab the frame from the threaded video stream and resize it
         # to have a maximum width of 400 pixels
-        frame = vs.read()
+        #frame = vs.read()
+        
+        camera.capture(rawCapture, format="bgr")
+        frame = rawCapture.array
+        
         frame = imutils.resize(frame, width=400)
 
         #################################### NEW
@@ -214,10 +227,10 @@ while True:
             print(rpi_data) #included this to make sure logic works
             if maskcount > nomaskcount:
                 print("Mask")
-                send_data("Mask")
+                # send_data("Mask")
             else:
                 print("No Mask")
-                send_data("No Mask")
+                # send_data("No Mask")
             maskcount = 0
             nomaskcount = 0
             rpi_data.clear()
