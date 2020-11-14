@@ -24,7 +24,7 @@ flag = -1
 GPIO.setmode(GPIO.BCM)  
   
 # GPIO 23 set up as input. It is pulled up to stop false signals  
-GPIO.setup(23, GPIO.IN, pull_up_down=GPIO.PUD_UP)  
+GPIO.setup(23, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)  
    
 # now the program will do nothing until the signal on port 23   
 # starts to fall towards zero. This is why we used the pullup  
