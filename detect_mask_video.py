@@ -151,6 +151,7 @@ rpi_data = []
 maskcount = 0
 nomaskcount = 0
 
+camera = None
 
 
 while True:
