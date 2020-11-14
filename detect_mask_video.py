@@ -172,7 +172,7 @@ while True:
         for image in camera.capture_continuous(rawCapture, format="bgr", use_video_port=True):
             frame = image.array
 
-            frame = imutils.resize(image, width=400)
+            frame = imutils.resize(frame, width=400)
 
             #################################### NEW
             allMask = True
