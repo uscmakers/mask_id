@@ -19,22 +19,22 @@ from picamera import PiCamera
 
 import RPi.GPIO as GPIO  
 
-flag = -1
+flag = 0
 
 GPIO.setmode(GPIO.BCM)  
   
 # GPIO 23 set up as input. It is pulled up to stop false signals  
-GPIO.setup(23, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)  
+GPIO.setup(23, GPIO.IN, pull_up_down=GPIO.PUD_UP)  
    
 # now the program will do nothing until the signal on port 23   
 # starts to fall towards zero. This is why we used the pullup  
 # to keep the signal high and prevent a false interrupt   
 
-def my_callback(channel):
-    print("interrupt detected")
-    flag = 1
+# def my_callback(channel):
+#     print("interrupt detected")
+#     flag = 1
 
-GPIO.add_event_detect(23, GPIO.RISING, callback=my_callback) 
+# GPIO.add_event_detect(23, GPIO.RISING, callback=my_callback) 
 
 def detect_and_predict_mask(frame, faceNet, maskNet):
     # grab the dimensions of the frame and then construct a blob
@@ -130,7 +130,7 @@ ap.add_argument("-m", "--model", type=str,
 ap.add_argument("-c", "--confidence", type=float, default=0.5,
     help="minimum probability to filter weak detections")
 args = vars(ap.parse_args())
-'''
+
 # load our serialized face detector model from disk
 print("[INFO] loading face detector model...")
 prototxtPath = os.path.sep.join([args["face"], "deploy.prototxt"])
@@ -159,18 +159,19 @@ print("[INFO] starting video stream...")
 camera = PiCamera()
 camera.resolution = (640, 480)
 camera.framerate = 32
-time.sleep(2.0)
+# time.sleep(2.0)
             # grab the frame from the threaded video stream and resize it
             # to have a maximum width of 400 pixels
             #frame = vs.read()
-'''
+
 
 while True:
     # loop over the frames from the video stream
-    if flag:
-        flag = 0
-        print("Interrupt in loop working!")
-    '''
+    if GPIO.input(23) == GPIO.LOW:
+        print("Button pushed!")
+        flag = 1
+        time.sleep(1)
+
     while flag:
         rawCapture = PiRGBArray(camera)
         for image in camera.capture_continuous(rawCapture, format="bgr", use_video_port=True):
@@ -255,7 +256,7 @@ while True:
         
             
         rawCapture.truncate(0)
-    '''
+
 
 # do a bit of cleanup
 cv2.destroyAllWindows()
