@@ -31,6 +31,7 @@ GPIO.setup(23, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
 # to keep the signal high and prevent a false interrupt   
 
 def my_callback(channel):
+    print("interrupt detected")
     flag = 1
 
 GPIO.add_event_detect(23, GPIO.RISING, callback=my_callback) 
@@ -155,7 +156,6 @@ nomaskcount = 0
 print("[INFO] starting video stream...")
             # vs = VideoStream(src=0).start()
             # time.sleep(2.0)
-print("interrupt detected")
 camera = PiCamera()
 camera.resolution = (640, 480)
 camera.framerate = 32
@@ -168,9 +168,8 @@ time.sleep(2.0)
 
 while True:
     # loop over the frames from the video stream
- 
-    while flag:
-           
+    print("Flag: " + flag)
+    while flag:        
         camera.capture(rawCapture, format="bgr")
         frame = rawCapture.array
         
