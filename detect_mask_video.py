@@ -159,7 +159,6 @@ print("[INFO] starting video stream...")
 camera = PiCamera()
 camera.resolution = (640, 480)
 camera.framerate = 32
-rawCapture = PiRGBArray(camera)
 time.sleep(2.0)
             # grab the frame from the threaded video stream and resize it
             # to have a maximum width of 400 pixels
@@ -168,8 +167,8 @@ time.sleep(2.0)
 
 while True:
     # loop over the frames from the video stream
-    print("Flag: " + str(flag))
-    while flag:        
+    while flag:
+        rawCapture = PiRGBArray(camera)
         camera.capture(rawCapture, format="bgr")
         frame = rawCapture.array
         
