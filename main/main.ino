@@ -19,7 +19,7 @@ int status = WL_IDLE_STATUS;
 const int LED_PIN = 8;  //Pin LED
 int StatoSwitch = 0;
 const int REED_PIN = 11; // Pin connected to reed switch
-int angle = 0;
+int angle = 85;
 
 void setup() {
   //wifiSetup();
@@ -116,7 +116,7 @@ void servoLoop() {
   if (mask_flag == 1 && lock_flag == 1 && prox == LOW){
     Serial.println("mask on");
     Serial.println("unlock door");
-    for(angle = 0; angle < 80; angle++) {                                  
+    for(angle = 85; angle >= 10; angle--) {                                  
         servo.write(angle);               
         delay(15);                   
     }
@@ -127,7 +127,7 @@ void servoLoop() {
   else if(lock_flag == 0 && prox == LOW){
     // now scan back from 80 to 0 degrees
     Serial.println("lock door ");
-    for(angle = 80; angle > 0; angle--){                                
+    for(angle = 10; angle <= 85; angle++){                                
       servo.write(angle);           
       delay(15);       
     }
