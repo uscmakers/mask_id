@@ -130,7 +130,7 @@ ap.add_argument("-m", "--model", type=str,
 ap.add_argument("-c", "--confidence", type=float, default=0.5,
     help="minimum probability to filter weak detections")
 args = vars(ap.parse_args())
-
+'''
 # load our serialized face detector model from disk
 print("[INFO] loading face detector model...")
 prototxtPath = os.path.sep.join([args["face"], "deploy.prototxt"])
@@ -163,10 +163,14 @@ time.sleep(2.0)
             # grab the frame from the threaded video stream and resize it
             # to have a maximum width of 400 pixels
             #frame = vs.read()
-
+'''
 
 while True:
     # loop over the frames from the video stream
+    if flag:
+        flag = 0
+        print("Interrupt in loop working!")
+    '''
     while flag:
         rawCapture = PiRGBArray(camera)
         for image in camera.capture_continuous(rawCapture, format="bgr", use_video_port=True):
@@ -251,7 +255,7 @@ while True:
         
             
         rawCapture.truncate(0)
-
+    '''
 
 # do a bit of cleanup
 cv2.destroyAllWindows()
