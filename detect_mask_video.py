@@ -221,7 +221,7 @@ while True:
 
             i = i+1
 
-            if len(rpi_data) == 10:
+            if len(rpi_data) == 5:
                 print(rpi_data) #included this to make sure logic works
                 if maskcount > nomaskcount:
                     print("Mask")
