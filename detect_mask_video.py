@@ -161,9 +161,8 @@ while True:
         # vs = VideoStream(src=0).start()
         # time.sleep(2.0)
         camera = PiCamera()
-        camera.resolution = (640, 480)
         camera.framerate = 32
-        rawCapture = PiRGBArray(camera, size=(640, 480))
+        rawCapture = PiRGBArray(camera)
         time.sleep(2.0)
         
     while flag:
