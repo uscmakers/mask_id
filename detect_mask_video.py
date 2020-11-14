@@ -167,7 +167,7 @@ time.sleep(2.0)
 
 while True:
     # loop over the frames from the video stream
-    while flag:
+    if flag:
         rawCapture = PiRGBArray(camera)
         for image in camera.capture_continuous(rawCapture, format="bgr", use_video_port=True):
             frame = image.array
