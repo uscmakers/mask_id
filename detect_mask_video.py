@@ -153,6 +153,12 @@ rpi_data = []
 maskcount = 0
 nomaskcount = 0
 
+camera = PiCamera()
+camera.resolution = (640, 480)
+camera.framerate = 32
+rawCapture = PiRGBArray(camera)
+time.sleep(2.0)
+
 while True:
     # loop over the frames from the video stream
     if flag == 1:
@@ -160,11 +166,10 @@ while True:
         print("[INFO] starting video stream...")
         # vs = VideoStream(src=0).start()
         # time.sleep(2.0)
-        camera = PiCamera()
-        camera.resolution = (640, 480)
-        camera.framerate = 32
-        rawCapture = PiRGBArray(camera)
-        time.sleep(2.0)
+        print("interrupt detected")
+        
+        
+       
         
     while flag:
         # grab the frame from the threaded video stream and resize it
@@ -235,6 +240,7 @@ while True:
             nomaskcount = 0
             rpi_data.clear()
             flag = 0
+            
 
         ##########################################
 
