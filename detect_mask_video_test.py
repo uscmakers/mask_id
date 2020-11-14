@@ -1,6 +1,7 @@
 # USAGE
 # python detect_mask_video_test.py
 import RPi.GPIO as GPIO  
+import time
 
 flag = 0
 
@@ -17,13 +18,13 @@ def my_callback(channel):
     print("interrupt detected")
     flag = 1
 
-GPIO.add_event_detect(23, GPIO.RISING, callback=my_callback) 
+# GPIO.add_event_detect(23, GPIO.RISING, callback=my_callback) 
 
 while True:
     # loop over the frames from the video stream
-
-    if GPIO.input(23) == GPIO.HIGH:
+    if GPIO.input(23) == GPIO.LOW:
         print("Button pushed!")
+        time.sleep(2)
 
 # do a bit of cleanup
 cv2.destroyAllWindows()
