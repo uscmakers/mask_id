@@ -168,7 +168,7 @@ time.sleep(2.0)
 
 while True:
     # loop over the frames from the video stream
-    print("Flag: " + flag)
+    print("Flag: " + str(flag))
     while flag:        
         camera.capture(rawCapture, format="bgr")
         frame = rawCapture.array
