@@ -233,6 +233,7 @@ while True:
                 nomaskcount = 0
                 rpi_data.clear()
                 flag = 0
+                break
                 
 
             ##########################################
