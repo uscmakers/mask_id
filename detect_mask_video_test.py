@@ -22,9 +22,8 @@ GPIO.add_event_detect(23, GPIO.RISING, callback=my_callback)
 while True:
     # loop over the frames from the video stream
 
-    if flag:
-        print("Interrupt In loop detected!")
-        flag = 0
+    if GPIO.input(23) == GPIO.HIGH:
+        print("Button pushed!")
 
 # do a bit of cleanup
 cv2.destroyAllWindows()
