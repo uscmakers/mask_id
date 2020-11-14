@@ -211,7 +211,7 @@ while True:
 
         ####################################### NEW
 
-        if i == 30:
+        if i == 2:
             if allMask == True:
                 rpi_data.append(1)
                 maskcount = maskcount + 1
