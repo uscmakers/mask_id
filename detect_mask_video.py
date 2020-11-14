@@ -29,9 +29,11 @@ GPIO.setup(23, GPIO.IN, pull_up_down=GPIO.PUD_UP)
 # now the program will do nothing until the signal on port 23   
 # starts to fall towards zero. This is why we used the pullup  
 # to keep the signal high and prevent a false interrupt   
-try:
-    GPIO.wait_for_edge(23, GPIO.FALLING)
-    flag = 1  
+
+def my_callback(channel):
+    flag = 1
+
+GPIO.add_event_detect(24, GPIO.RISING, callback=my_callback)
     
 except KeyboardInterrupt:  
     GPIO.cleanup()       # clean up GPIO on CTRL+C exit  
@@ -153,11 +155,7 @@ rpi_data = []
 maskcount = 0
 nomaskcount = 0
 
-camera = PiCamera()
-camera.resolution = (640, 480)
-camera.framerate = 32
-rawCapture = PiRGBArray(camera)
-time.sleep(2.0)
+
 
 while True:
     # loop over the frames from the video stream
@@ -167,6 +165,11 @@ while True:
         # vs = VideoStream(src=0).start()
         # time.sleep(2.0)
         print("interrupt detected")
+        camera = PiCamera()
+        camera.resolution = (640, 480)
+        camera.framerate = 32
+        rawCapture = PiRGBArray(camera)
+        time.sleep(2.0)
         
         
        
