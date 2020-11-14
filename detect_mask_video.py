@@ -33,7 +33,7 @@ GPIO.setup(23, GPIO.IN, pull_up_down=GPIO.PUD_UP)
 def my_callback(channel):
     flag = 1
 
-GPIO.add_event_detect(24, GPIO.RISING, callback=my_callback) 
+GPIO.add_event_detect(23, GPIO.RISING, callback=my_callback) 
 
 def detect_and_predict_mask(frame, faceNet, maskNet):
     # grab the dimensions of the frame and then construct a blob
