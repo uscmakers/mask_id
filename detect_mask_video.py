@@ -151,29 +151,26 @@ rpi_data = []
 maskcount = 0
 nomaskcount = 0
 
-camera = None
+# initialize the video stream and allow the camera sensor to warm up
+print("[INFO] starting video stream...")
+            # vs = VideoStream(src=0).start()
+            # time.sleep(2.0)
+print("interrupt detected")
+camera = PiCamera()
+camera.resolution = (640, 480)
+camera.framerate = 32
+rawCapture = PiRGBArray(camera)
+time.sleep(2.0)
+            # grab the frame from the threaded video stream and resize it
+            # to have a maximum width of 400 pixels
+            #frame = vs.read()
 
 
 while True:
     # loop over the frames from the video stream
  
     while flag:
-    
-        if len(rpi_data) == 0:
-            # initialize the video stream and allow the camera sensor to warm up
-            print("[INFO] starting video stream...")
-            # vs = VideoStream(src=0).start()
-            # time.sleep(2.0)
-            print("interrupt detected")
-            camera = PiCamera()
-            camera.resolution = (640, 480)
-            camera.framerate = 32
-            rawCapture = PiRGBArray(camera)
-            time.sleep(2.0)
-            # grab the frame from the threaded video stream and resize it
-            # to have a maximum width of 400 pixels
-            #frame = vs.read()
-        
+           
         camera.capture(rawCapture, format="bgr")
         frame = rawCapture.array
         
