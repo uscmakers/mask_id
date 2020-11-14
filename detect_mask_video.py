@@ -235,8 +235,6 @@ while True:
             rpi_data.clear()
             flag = 0
 
-        
-
         ##########################################
 
         # show the output frame
@@ -246,6 +244,8 @@ while True:
         # if the `q` key was pressed, break from the loop
         if key == ord("q"):
             break
+            
+        rawCapture.truncate(0)
 
 
 # do a bit of cleanup
