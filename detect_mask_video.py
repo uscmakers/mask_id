@@ -19,7 +19,7 @@ from picamera import PiCamera
 
 import RPi.GPIO as GPIO  
 
-flag = 0
+flag = -1
 
 GPIO.setmode(GPIO.BCM)  
   
