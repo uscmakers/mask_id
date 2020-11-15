@@ -232,7 +232,7 @@ while True:
 
         i = i+1
 
-        if len(rpi_data) == 5:
+        if len(rpi_data) == 3:
             print(rpi_data) #included this to make sure logic works
 
             # stop the timer and display FPS information
