@@ -165,121 +165,106 @@ args = vars(ap.parse_args())
 # and start the FPS counter
 print("[INFO] sampling THREADED frames from `picamera` module...")
 vs = PiVideoStream().start()
-time.sleep(2.0)
-fps = FPS().start()
-# loop over some frames...this time using the threaded stream
-while fps._numFrames < args["num_frames"]:
-	# grab the frame from the threaded video stream and resize it
-	# to have a maximum width of 400 pixels
-	frame = vs.read()
-	frame = imutils.resize(frame, width=400)
-	# check to see if the frame should be displayed to our screen
-	if args["display"] > 0:
+	
+while True:
+    # loop over the frames from the video stream
+    if GPIO.input(23) == GPIO.LOW:
+        print("Button pushed!")
+        flag = 1
+        fps = FPS().start()
+        time.sleep(1)
+
+    while flag:
+        frame = vs.read()
+	    frame = imutils.resize(frame, width=400)
+
+        # display frame to our screen
 		cv2.imshow("Frame", frame)
 		key = cv2.waitKey(1) & 0xFF
-	# update the FPS counter
-	fps.update()
-# stop the timer and display FPS information
-fps.stop()
-print("[INFO] elasped time: {:.2f}".format(fps.elapsed()))
-print("[INFO] approx. FPS: {:.2f}".format(fps.fps()))
+        
+        # update the FPS counter
+        fps.update()
+        rawCapture = PiRGBArray(camera)
+
+        #################################### NEW
+        allMask = True
+        numfaces = []
+
+        # detect faces in the frame and determine if they are wearing a
+        # face mask or not
+        (locs, preds) = detect_and_predict_mask(frame, faceNet, maskNet)
+
+        # loop over the detected face locations and their corresponding
+        # locations
+        for (box, pred) in zip(locs, preds):
+            # unpack the bounding box and predictions
+            (startX, startY, endX, endY) = box
+            (mask, withoutMask) = pred
+
+            # determine the class label and color we'll use to draw
+            # the bounding box and text
+            label = "Mask" if mask > withoutMask else "No Mask"
+            color = (0, 255, 0) if label == "Mask" else (0, 0, 255)
+
+            ######################### NEW
+            if label == "No Mask":
+                allMask = False
+                
+
+            # include the probability in the label
+            label = "{}: {:.2f}%".format(label, max(mask, withoutMask) * 100)
+
+            # display the label and bounding box rectangle on the output
+            # frame
+            cv2.putText(frame, label, (startX, startY - 10),
+                cv2.FONT_HERSHEY_SIMPLEX, 0.45, color, 2)
+            cv2.rectangle(frame, (startX, startY), (endX, endY), color, 2)
+
+        ####################################### NEW
+
+        if i == 2:
+            if allMask == True:
+                rpi_data.append(1)
+                maskcount = maskcount + 1
+            else:
+                rpi_data.append(0)
+                nomaskcount = nomaskcount + 1
+            i = 0
+
+        i = i+1
+
+        if len(rpi_data) == 5:
+            print(rpi_data) #included this to make sure logic works
+
+            # stop the timer and display FPS information
+            fps.stop()
+            print("[INFO] elasped time: {:.2f}".format(fps.elapsed()))
+            print("[INFO] approx. FPS: {:.2f}".format(fps.fps()))
+            if maskcount > nomaskcount:
+                print("Mask")
+                # send_data("Mask")
+            else:
+                print("No Mask")
+                # send_data("No Mask")
+            maskcount = 0
+            nomaskcount = 0
+            rpi_data.clear()
+            flag = 0
+            break
+            
+
+        ##########################################
+
+        # show the output frame
+        cv2.imshow("Frame", frame)
+        key = cv2.waitKey(1) & 0xFF
+
+        rawCapture.truncate(0)
+
+        # if the `q` key was pressed, break from the loop
+        if key == ord("q"):
+            break
+
 # do a bit of cleanup
 cv2.destroyAllWindows()
 vs.stop()
-
-# while True:
-#     # loop over the frames from the video stream
-#     if GPIO.input(23) == GPIO.LOW:
-#         print("Button pushed!")
-#         flag = 1
-#         time.sleep(1)
-
-#     while flag:
-#         rawCapture = PiRGBArray(camera)
-#         for image in camera.capture_continuous(rawCapture, format="bgr", use_video_port=True):
-#             frame = image.array
-
-#             frame = imutils.resize(frame, width=400)
-
-#             #################################### NEW
-#             allMask = True
-#             numfaces = []
-
-#             # detect faces in the frame and determine if they are wearing a
-#             # face mask or not
-#             (locs, preds) = detect_and_predict_mask(frame, faceNet, maskNet)
-
-#             # loop over the detected face locations and their corresponding
-#             # locations
-#             for (box, pred) in zip(locs, preds):
-#                 # unpack the bounding box and predictions
-#                 (startX, startY, endX, endY) = box
-#                 (mask, withoutMask) = pred
-
-#                 # determine the class label and color we'll use to draw
-#                 # the bounding box and text
-#                 label = "Mask" if mask > withoutMask else "No Mask"
-#                 color = (0, 255, 0) if label == "Mask" else (0, 0, 255)
-
-#                 ######################### NEW
-#                 if label == "No Mask":
-#                     allMask = False
-                    
-
-#                 # include the probability in the label
-#                 label = "{}: {:.2f}%".format(label, max(mask, withoutMask) * 100)
-
-#                 # display the label and bounding box rectangle on the output
-#                 # frame
-#                 cv2.putText(frame, label, (startX, startY - 10),
-#                     cv2.FONT_HERSHEY_SIMPLEX, 0.45, color, 2)
-#                 cv2.rectangle(frame, (startX, startY), (endX, endY), color, 2)
-
-#             ####################################### NEW
-
-#             if i == 2:
-#                 if allMask == True:
-#                     rpi_data.append(1)
-#                     maskcount = maskcount + 1
-#                 else:
-#                     rpi_data.append(0)
-#                     nomaskcount = nomaskcount + 1
-#                 i = 0
-
-#             i = i+1
-
-#             if len(rpi_data) == 5:
-#                 print(rpi_data) #included this to make sure logic works
-#                 if maskcount > nomaskcount:
-#                     print("Mask")
-#                     # send_data("Mask")
-#                 else:
-#                     print("No Mask")
-#                     # send_data("No Mask")
-#                 maskcount = 0
-#                 nomaskcount = 0
-#                 rpi_data.clear()
-#                 flag = 0
-#                 break
-                
-
-#             ##########################################
-
-#             # show the output frame
-#             cv2.imshow("Frame", frame)
-#             key = cv2.waitKey(1) & 0xFF
-
-#             rawCapture.truncate(0)
-
-#             # if the `q` key was pressed, break from the loop
-#             if key == ord("q"):
-#                 break
-
-        
-            
-#         rawCapture.truncate(0)
-
-
-# # do a bit of cleanup
-# cv2.destroyAllWindows()
-# vs.stop()
