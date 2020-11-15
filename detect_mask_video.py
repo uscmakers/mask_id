@@ -226,16 +226,14 @@ while True:
 
         ####################################### NEW
 
-        if i == 2:
-            if allMask == True:
-                rpi_data.append(1)
-                maskcount = maskcount + 1
-            else:
-                rpi_data.append(0)
-                nomaskcount = nomaskcount + 1
-            i = 0
+        if allMask == True:
+            rpi_data.append(1)
+            maskcount = maskcount + 1
+        else:
+            rpi_data.append(0)
+            nomaskcount = nomaskcount + 1
 
-        i = i+1
+        # i = i+1
 
         if len(rpi_data) == 5:
             print(rpi_data) #included this to make sure logic works
