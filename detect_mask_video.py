@@ -13,7 +13,6 @@ import time
 import cv2
 import os
 import socket
-
 import RPi.GPIO as GPIO  
 
 flag = 0
@@ -21,6 +20,7 @@ flag = 0
 GPIO.setmode(GPIO.BCM)  
   
 # GPIO 23 set up as input. It is pulled up to stop false signals  
+
 GPIO.setup(23, GPIO.IN, pull_up_down=GPIO.PUD_UP)
 
 def detect_and_predict_mask(frame, faceNet, maskNet):
@@ -98,18 +98,13 @@ ap.add_argument("-m", "--model", type=str,
     help="path to trained face mask detector model")
 ap.add_argument("-c", "--confidence", type=float, default=0.5,
     help="minimum probability to filter weak detections")
-ap.add_argument("-n", "--num-frames", type=int, default=100,
-    help="# of frames to loop over for FPS test")
-ap.add_argument("-d", "--display", type=int, default=-1,
-    help="Whether or not frames should be displayed")
-args = vars(ap.parse_args())
 
-# # load our serialized face detector model from disk
 print("[INFO] loading face detector model...")
 prototxtPath = os.path.sep.join([args["face"], "deploy.prototxt"])
 weightsPath = os.path.sep.join([args["face"],
     "res10_300x300_ssd_iter_140000.caffemodel"])
 faceNet = cv2.dnn.readNet(prototxtPath, weightsPath)
+
 
 # # load the face mask detector model from disk
 print("[INFO] loading face mask detector model...")
@@ -226,5 +221,3 @@ except KeyboardInterrupt:
     cv2.destroyAllWindows()
     vs.stop()
     client.close()
-
-
