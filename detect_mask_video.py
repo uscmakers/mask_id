@@ -137,91 +137,94 @@ print("Connection from: " + str(addr))
 # created a *threaded *video stream, allow the camera sensor to warmup,
 print("[INFO] sampling THREADED frames from `picamera` module...")
 video_getter_and_shower = VideoGetAndShow().start()
-    
-while True:
-    # loop over the frames from the video stream
-    if video_getter_and_shower.stopped:
-        video_getter_and_shower.stop()
-        break
 
-    if GPIO.input(23) == GPIO.LOW:
-        print("Button pushed!")
-        flag = 1
-        # Start the FPS counter
-        fps = FPS().start()
-        time.sleep(1)
+try:
+    while True:
+        # loop over the frames from the video stream
+        if video_getter_and_shower.stopped:
+            video_getter_and_shower.stop()
+            break
 
-    while flag:
-        frame = video_getter_and_shower.getFrame()
+        if GPIO.input(23) == GPIO.LOW:
+            print("Button pushed!")
+            flag = 1
+            # Start the FPS counter
+            fps = FPS().start()
+            time.sleep(1)
 
-        # update the FPS counter
-        fps.update()
+        while flag:
+            frame = video_getter_and_shower.getFrame()
 
-        allMask = True
-        numfaces = []
+            # update the FPS counter
+            fps.update()
 
-        if i == 2:
-            # detect faces in the frame and determine if they are wearing a
-            # face mask or not
-            (locs, preds) = detect_and_predict_mask(frame, faceNet, maskNet)
+            allMask = True
+            numfaces = []
 
-            # loop over the detected face locations and their corresponding
-            # locations
-            for (box, pred) in zip(locs, preds):
-                # unpack the bounding box and predictions
-                (startX, startY, endX, endY) = box
-                (mask, withoutMask) = pred
+            if i == 2:
+                # detect faces in the frame and determine if they are wearing a
+                # face mask or not
+                (locs, preds) = detect_and_predict_mask(frame, faceNet, maskNet)
 
-                # determine the class label and color we'll use to draw
-                # the bounding box and text
-                label = "Mask" if mask > withoutMask else "No Mask"
-                color = (0, 255, 0) if label == "Mask" else (0, 0, 255)
+                # loop over the detected face locations and their corresponding
+                # locations
+                for (box, pred) in zip(locs, preds):
+                    # unpack the bounding box and predictions
+                    (startX, startY, endX, endY) = box
+                    (mask, withoutMask) = pred
 
-                ######################### NEW
-                if label == "No Mask":
-                    allMask = False
-                    
+                    # determine the class label and color we'll use to draw
+                    # the bounding box and text
+                    label = "Mask" if mask > withoutMask else "No Mask"
+                    color = (0, 255, 0) if label == "Mask" else (0, 0, 255)
 
-                # include the probability in the label
-                label = "{}: {:.2f}%".format(label, max(mask, withoutMask) * 100)
+                    ######################### NEW
+                    if label == "No Mask":
+                        allMask = False
+                        
 
-                # display the label and bounding box rectangle on the output
-                # frame
-                cv2.putText(frame, label, (startX, startY - 10),
-                    cv2.FONT_HERSHEY_SIMPLEX, 0.45, color, 2)
-                cv2.rectangle(frame, (startX, startY), (endX, endY), color, 2)
-                cv2.imshow("Video", frame)
+                    # include the probability in the label
+                    label = "{}: {:.2f}%".format(label, max(mask, withoutMask) * 100)
 
-            if allMask == True:
-                rpi_data.append(1)
-                maskcount = maskcount + 1
-            else:
-                rpi_data.append(0)
-                nomaskcount = nomaskcount + 1
-            i = 0
+                    # display the label and bounding box rectangle on the output
+                    # frame
+                    cv2.putText(frame, label, (startX, startY - 10),
+                        cv2.FONT_HERSHEY_SIMPLEX, 0.45, color, 2)
+                    cv2.rectangle(frame, (startX, startY), (endX, endY), color, 2)
+                    cv2.imshow("Video", frame)
 
-        i = i + 1
+                if allMask == True:
+                    rpi_data.append(1)
+                    maskcount = maskcount + 1
+                else:
+                    rpi_data.append(0)
+                    nomaskcount = nomaskcount + 1
+                i = 0
 
-        if len(rpi_data) == 3:
-            print(rpi_data) #included this to make sure logic works
+            i = i + 1
 
-            # stop the timer and display FPS information
-            fps.stop()
-            print("[INFO] elasped time: {:.2f}".format(fps.elapsed()))
-            print("[INFO] approx. FPS: {:.2f}".format(fps.fps()))
-            if maskcount > nomaskcount:
-                print("Mask")
-                client.send("MASK".encode('utf-8'))
-            else:
-                print("No Mask")
-                client.send("NO MASK".encode('utf-8'))
-            maskcount = 0
-            nomaskcount = 0
-            rpi_data.clear()
-            flag = 0
-            break            
+            if len(rpi_data) == 3:
+                print(rpi_data) #included this to make sure logic works
 
-# do a bit of cleanup
-cv2.destroyAllWindows()
-vs.stop()
-client.close()
+                # stop the timer and display FPS information
+                fps.stop()
+                print("[INFO] elasped time: {:.2f}".format(fps.elapsed()))
+                print("[INFO] approx. FPS: {:.2f}".format(fps.fps()))
+                if maskcount > nomaskcount:
+                    print("Mask")
+                    client.send("MASK".encode('utf-8'))
+                else:
+                    print("No Mask")
+                    client.send("NO MASK".encode('utf-8'))
+                maskcount = 0
+                nomaskcount = 0
+                rpi_data.clear()
+                flag = 0
+                break
+except KeyboardInterrupt:
+    # do a bit of cleanup
+    cv2.destroyAllWindows()
+    vs.stop()
+    client.close()
+
+
