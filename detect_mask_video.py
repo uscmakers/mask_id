@@ -5,7 +5,7 @@
 from tensorflow.keras.applications.mobilenet_v2 import preprocess_input
 from tensorflow.keras.preprocessing.image import img_to_array
 from tensorflow.keras.models import load_model
-from pi_video import PiVideoStream
+from imutils.video.pivideostream import PiVideoStream
 from imutils.video import VideoStream
 from imutils.video import FPS
 import numpy as np
@@ -164,7 +164,7 @@ args = vars(ap.parse_args())
 # created a *threaded *video stream, allow the camera sensor to warmup,
 # and start the FPS counter
 print("[INFO] sampling THREADED frames from `picamera` module...")
-vs = pi_video.PiVideoStream().start()
+vs = PiVideoStream().start()
 time.sleep(2.0)
 fps = FPS().start()
 # loop over some frames...this time using the threaded stream
