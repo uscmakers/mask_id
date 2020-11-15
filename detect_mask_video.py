@@ -82,7 +82,7 @@ def detect_and_predict_mask(frame, faceNet, maskNet):
         preds = maskNet.predict(faces, batch_size=32)
 
     end = time.time()
-    print(f"Runtime of the detect and mask prediction is {end - start}")
+    print(f"Runtime of the detect and mask prediction is {end - start} seconds")
 
     # return a 2-tuple of the face locations and their corresponding
     # locations
@@ -211,10 +211,10 @@ try:
                 print("[INFO] elasped time: {:.2f}".format(fps.elapsed()))
                 print("[INFO] approx. FPS: {:.2f}".format(fps.fps()))
                 if maskcount > nomaskcount:
-                    print("Mask")
+                    print("Mask detected")
                     client.send("MASK".encode('utf-8'))
                 else:
-                    print("No Mask")
+                    print("No Mask detected")
                     client.send("NO MASK".encode('utf-8'))
                 maskcount = 0
                 nomaskcount = 0
