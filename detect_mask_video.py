@@ -5,7 +5,7 @@
 from tensorflow.keras.applications.mobilenet_v2 import preprocess_input
 from tensorflow.keras.preprocessing.image import img_to_array
 from tensorflow.keras.models import load_model
-from imutils.video.pivideostream import PiVideoStream
+from pi_video import PiVideoStream
 from imutils.video import VideoStream
 from imutils.video import FPS
 import numpy as np
@@ -28,48 +28,6 @@ GPIO.setmode(GPIO.BCM)
   
 # GPIO 23 set up as input. It is pulled up to stop false signals  
 GPIO.setup(23, GPIO.IN, pull_up_down=GPIO.PUD_UP)  
-
-class PiVideoStream:
-	def __init__(self, resolution=(320, 240), framerate=32):
-		# initialize the camera and stream
-		self.camera = PiCamera()
-		self.camera.resolution = resolution
-		self.camera.framerate = framerate
-		self.rawCapture = PiRGBArray(self.camera, size=resolution)
-		self.stream = self.camera.capture_continuous(self.rawCapture,
-			format="bgr", use_video_port=True)
-		# initialize the frame and the variable used to indicate
-		# if the thread should be stopped
-		self.frame = None
-		self.stopped = False
-    
-	def start(self):
-		# start the thread to read frames from the video stream
-		Thread(target=self.update, args=()).start()
-		return self
-
-	def update(self):
-		# keep looping infinitely until the thread is stopped
-		for f in self.stream:
-			# grab the frame from the stream and clear the stream in
-			# preparation for the next frame
-			self.frame = f.array
-			self.rawCapture.truncate(0)
-			# if the thread indicator variable is set, stop the thread
-			# and resource camera resources
-			if self.stopped:
-				self.stream.close()
-				self.rawCapture.close()
-				self.camera.close()
-				return
-    
-	def read(self):
-		# return the frame most recently read
-		return self.frame
-
-	def stop(self):
-		# indicate that the thread should be stopped
-		self.stopped = True
 
 def detect_and_predict_mask(frame, faceNet, maskNet):
     # grab the dimensions of the frame and then construct a blob
@@ -206,7 +164,7 @@ args = vars(ap.parse_args())
 # created a *threaded *video stream, allow the camera sensor to warmup,
 # and start the FPS counter
 print("[INFO] sampling THREADED frames from `picamera` module...")
-vs = PiVideoStream().start()
+vs = pi_video.PiVideoStream().start()
 time.sleep(2.0)
 fps = FPS().start()
 # loop over some frames...this time using the threaded stream
