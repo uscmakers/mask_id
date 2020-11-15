@@ -226,6 +226,7 @@ while True:
             else:
                 rpi_data.append(0)
                 nomaskcount = nomaskcount + 1
+            i = 0
 
         i = i+1
 
