@@ -9,14 +9,10 @@ from imutils.video import FPS
 from pi_video import VideoGetAndShow
 import numpy as np
 import argparse
-import imutils
 import time
 import cv2
 import os
 import socket
-import threading as Thread
-
-from picamera.array import PiRGBArray
 
 import RPi.GPIO as GPIO  
 
@@ -92,28 +88,6 @@ def detect_and_predict_mask(frame, faceNet, maskNet):
     # locations
     return (locs, preds)
 
-# def send_data(data):
-#     # Replace host and port with host and port of RPi
-#     host = '192.168.1.101'
-#     port = 5000
-
-#     s = socket.socket()
-#     s.bind((host,port))
-
-#     print('Binded to ' + str(host) + ' ' + str(port))
-#     s.listen(1)
-#     c, addr = s.accept()
-#     print("Connection from: " + str(addr))
-#     while True:
-#         # data = c.recv(1024).decode('utf-8')
-#         # if not data:
-#         #     break
-#         # print("From connected user: " + data)
-#         # data = data.upper()
-#         # print("Sending: " + data)
-#         c.send(data.encode('utf-8'))
-#     c.close()
-
 # construct the argument parser and parse the arguments
 ap = argparse.ArgumentParser()
 ap.add_argument("-f", "--face", type=str,
@@ -141,26 +115,26 @@ faceNet = cv2.dnn.readNet(prototxtPath, weightsPath)
 print("[INFO] loading face mask detector model...")
 maskNet = load_model(args["model"])
 
+# Initialize necessary variables
 i = 0
 rpi_data = []
 maskcount = 0
 nomaskcount = 0
 
-# ####################################### NEW
+# Connect to the Arduino
+# Replace host and port with host and port of RPi
+host = '192.168.1.219'
+port = 5000
 
+s = socket.socket()
+s.bind((host,port))
 
-# initialize the video stream and allow the camera sensor to warm up
-# print("[INFO] starting video stream...")
-            # vs = VideoStream(src=0).start()
-            # time.sleep(2.0)
-
-# time.sleep(2.0)
-            # grab the frame from the threaded video stream and resize it
-            # to have a maximum width of 400 pixels
-            # frame = vs.read()
+print('Binded to ' + str(host) + ' ' + str(port))
+s.listen(1)
+client, addr = s.accept()
+print("Connection from: " + str(addr))
 
 # created a *threaded *video stream, allow the camera sensor to warmup,
-# and start the FPS counter
 print("[INFO] sampling THREADED frames from `picamera` module...")
 video_getter_and_shower = VideoGetAndShow().start()
     
@@ -173,19 +147,16 @@ while True:
     if GPIO.input(23) == GPIO.LOW:
         print("Button pushed!")
         flag = 1
+        # Start the FPS counter
         fps = FPS().start()
         time.sleep(1)
 
     while flag:
         frame = video_getter_and_shower.getFrame()
-         # frame = putIterationsPerSec(frame, cps.countsPerSec())
-
-        # key = cv2.waitKey(1) & 0xFF
 
         # update the FPS counter
         fps.update()
 
-        #################################### NEW
         allMask = True
         numfaces = []
 
@@ -221,7 +192,6 @@ while True:
                 cv2.rectangle(frame, (startX, startY), (endX, endY), color, 2)
                 cv2.imshow("Video", frame)
 
-            ####################################### NEW
             if allMask == True:
                 rpi_data.append(1)
                 maskcount = maskcount + 1
@@ -230,7 +200,7 @@ while True:
                 nomaskcount = nomaskcount + 1
             i = 0
 
-        i = i+1
+        i = i + 1
 
         if len(rpi_data) == 3:
             print(rpi_data) #included this to make sure logic works
@@ -241,19 +211,17 @@ while True:
             print("[INFO] approx. FPS: {:.2f}".format(fps.fps()))
             if maskcount > nomaskcount:
                 print("Mask")
-                # send_data("Mask")
+                client.send("MASK".encode('utf-8'))
             else:
                 print("No Mask")
-                # send_data("No Mask")
+                client.send("NO MASK".encode('utf-8'))
             maskcount = 0
             nomaskcount = 0
             rpi_data.clear()
             flag = 0
-            break
-            
-
-        ##########################################
+            break            
 
 # do a bit of cleanup
 cv2.destroyAllWindows()
 vs.stop()
+client.close()
