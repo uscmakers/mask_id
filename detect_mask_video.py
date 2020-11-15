@@ -124,7 +124,7 @@ nomaskcount = 0
 # Connect to the Arduino
 # Replace host and port with host and port of RPi
 host = '192.168.1.219'
-port = 5000
+port = 5007
 
 s = socket.socket()
 s.bind((host,port))
