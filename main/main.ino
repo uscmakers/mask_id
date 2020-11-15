@@ -5,16 +5,16 @@
 
 Servo servo;
 WiFiClient client;
-int mask_flag = 1;
+int mask_flag = 0;
 int lock_flag = 1;
 int prox = 0;
-char ssid[] = "ATT8T56pbr 2.4ghz"; // your network SSID (name)
-char pass[] = "7emn9+bq9kab"; // your network password (use for WPA, or use as key for WEP)
+char ssid[] = "SpectrumSetup-B8"; // your network SSID (name)
+char pass[] = "strongcar994"; // your network password (use for WPA, or use as key for WEP)
 
 // Replace host and port with host and port of RPi
-const char * host = "192.168.1.101";
-const uint16_t port = 5000;
-String message = "ON";
+const char * host = "192.168.1.219";
+const uint16_t port = 5007;
+String message = "";
 int status = WL_IDLE_STATUS;
 const int LED_PIN = 8;  //Pin LED
 int StatoSwitch = 0;
@@ -22,7 +22,7 @@ const int REED_PIN = 11; // Pin connected to reed switch
 int angle = 85;
 
 void setup() {
-  //wifiSetup();
+  wifiSetup();
   /* Reed Switch Setup */
   // Since the other end of the reed switch is connected to ground, we need
   // to pull-up the reed switch pin internally.
@@ -34,7 +34,7 @@ void setup() {
 }
 
 void loop() {
-  //wifiLoop();
+  wifiLoop();
   reed_loop();
   servoLoop();
 }
@@ -75,14 +75,19 @@ void wifiLoop() {
     message = message + c; 
     Serial.write(c);
   }
-//  if (message  == "ON"){
-//    mask_flag = 1;
-//    message = "OFF";
-//    
-//  }
-//  else if(message == "OFF"){
-//    mask_flag = 0;
-//  }
+  Serial.println(message);
+  delay(1000);
+  if (message  == "MASK"){
+    mask_flag = 1;
+    //Serial.println(message);
+    delay(2000);
+    
+  }
+  else if(message == "NO MASK"){
+    mask_flag = 0;
+    //Serial.println(message);
+    delay(2000);
+  }
   if (!client.connected()) {
     // if the server's disconnected, stop the client:
     Serial.println();
@@ -121,6 +126,8 @@ void servoLoop() {
         delay(15);                   
     }
     lock_flag = 0;
+    mask_flag = 0;
+    message = "";
     delay(5000);
   }
   // check if the door is unlocked and door is closed, then lock the lock
@@ -133,7 +140,7 @@ void servoLoop() {
     }
     //maybe add alarm if door is left open 
     lock_flag =1;
-    delay(5000);
+    delay(2000);
   }
   
 }
