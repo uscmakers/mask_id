@@ -5,9 +5,10 @@
 from tensorflow.keras.applications.mobilenet_v2 import preprocess_input
 from tensorflow.keras.preprocessing.image import img_to_array
 from tensorflow.keras.models import load_model
-from imutils.video.pivideostream import PiVideoStream
 from imutils.video import VideoStream
 from imutils.video import FPS
+from pi_video import VideoShow
+from pi_video import VideoGet
 import numpy as np
 import argparse
 import imutils
@@ -160,10 +161,16 @@ nomaskcount = 0
 # created a *threaded *video stream, allow the camera sensor to warmup,
 # and start the FPS counter
 print("[INFO] sampling THREADED frames from `picamera` module...")
-vs = PiVideoStream().start()
+video_getter = VideoGet(source).start()
+video_shower = VideoShow(video_getter.frame).start()
     
 while True:
     # loop over the frames from the video stream
+    if video_getter.stopped or video_shower.stopped:
+        video_shower.stop()
+        video_getter.stop()
+        break
+
     if GPIO.input(23) == GPIO.LOW:
         print("Button pushed!")
         flag = 1
@@ -171,12 +178,9 @@ while True:
         time.sleep(1)
 
     while flag:
-        frame = vs.read()
-        frame = imutils.resize(frame, width=400)
-
-        # display frame to our screen
-        cv2.imshow("Frame", frame)
-        key = cv2.waitKey(1) & 0xFF
+        frame = video_getter.frame
+        # frame = putIterationsPerSec(frame, cps.countsPerSec())
+        video_shower.frame = frame
         
         # update the FPS counter
         fps.update()

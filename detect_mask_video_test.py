@@ -22,9 +22,7 @@ def my_callback(channel):
 
 while True:
     # loop over the frames from the video stream
-    if GPIO.input(23) == GPIO.LOW:
-        print("Button pushed!")
-        time.sleep(2)
+    
 
 # do a bit of cleanup
 cv2.destroyAllWindows()
