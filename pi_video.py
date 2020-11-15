@@ -45,7 +45,7 @@ class VideoGet:
                 self.stop()
             else:
                 (self.grabbed, self.frame) = self.stream.read()
-				self.frame = imutils.resize(self.frame, width=400)
+                self.frame = imutils.resize(self.frame, width=400)
 
     def stop(self):
         self.stopped = True
