@@ -48,3 +48,30 @@ class VideoGet:
 
     def stop(self):
         self.stopped = True
+
+class VideoGetAndShow:
+    """
+    Class that continuously gets and shows frames from a VideoCapture object
+    with a dedicated thread.
+    """
+
+    def __init__(self):
+        self.video_getter = VideoGet(0).start()
+        self.video_shower = VideoShower(self.video_getter.frame).start()
+        self.frame = self.video_getter.frame
+
+    def start(self):    
+        Thread(target=self.getAndShow, args=()).start()
+        return self
+
+    def getAndShow(self):
+        while not self.stopped:
+            self.frame = self.video_getter.frame
+            # frame = putIterationsPerSec(frame, cps.countsPerSec())
+            self.video_shower.frame = frame
+
+    def getFrame(self):
+        return frame
+
+    def stop(self):
+        self.stopped = True

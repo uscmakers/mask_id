@@ -8,7 +8,6 @@ from tensorflow.keras.models import load_model
 from imutils.video import FPS
 from pi_video import VideoGet
 from pi_video import VideoShow
-from pi_video import getFrame
 import numpy as np
 import argparse
 import imutils
@@ -164,14 +163,12 @@ nomaskcount = 0
 # created a *threaded *video stream, allow the camera sensor to warmup,
 # and start the FPS counter
 print("[INFO] sampling THREADED frames from `picamera` module...")
-video_getter = VideoGet(0).start()
-video_shower = VideoShow(video_getter.frame).start()
+video_getter_and_shower = VideoGetAndShow().start()
     
 while True:
     # loop over the frames from the video stream
-    if video_getter.stopped or video_shower.stopped:
-        video_shower.stop()
-        video_getter.stop()
+    if video_getter_and_shower.stopped:
+        video_getter_and_shower.stop()
         break
 
     if GPIO.input(23) == GPIO.LOW:
@@ -181,9 +178,8 @@ while True:
         time.sleep(1)
 
     while flag:
-        frame = video_getter.frame
-        # frame = putIterationsPerSec(frame, cps.countsPerSec())
-        video_shower.frame = frame
+        frame = video_getter_and_shower.getFrame()
+         # frame = putIterationsPerSec(frame, cps.countsPerSec())
 
         # key = cv2.waitKey(1) & 0xFF
 
@@ -196,65 +192,65 @@ while True:
 
         # detect faces in the frame and determine if they are wearing a
         # face mask or not
-        # (locs, preds) = detect_and_predict_mask(frame, faceNet, maskNet)
+        (locs, preds) = detect_and_predict_mask(frame, faceNet, maskNet)
 
-        # # loop over the detected face locations and their corresponding
-        # # locations
-        # for (box, pred) in zip(locs, preds):
-        #     # unpack the bounding box and predictions
-        #     (startX, startY, endX, endY) = box
-        #     (mask, withoutMask) = pred
+        # loop over the detected face locations and their corresponding
+        # locations
+        for (box, pred) in zip(locs, preds):
+            # unpack the bounding box and predictions
+            (startX, startY, endX, endY) = box
+            (mask, withoutMask) = pred
 
-        #     # determine the class label and color we'll use to draw
-        #     # the bounding box and text
-        #     label = "Mask" if mask > withoutMask else "No Mask"
-        #     color = (0, 255, 0) if label == "Mask" else (0, 0, 255)
+            # determine the class label and color we'll use to draw
+            # the bounding box and text
+            label = "Mask" if mask > withoutMask else "No Mask"
+            color = (0, 255, 0) if label == "Mask" else (0, 0, 255)
 
-        #     ######################### NEW
-        #     if label == "No Mask":
-        #         allMask = False
+            ######################### NEW
+            if label == "No Mask":
+                allMask = False
                 
 
-        #     # include the probability in the label
-        #     label = "{}: {:.2f}%".format(label, max(mask, withoutMask) * 100)
+            # include the probability in the label
+            label = "{}: {:.2f}%".format(label, max(mask, withoutMask) * 100)
 
-        #     # display the label and bounding box rectangle on the output
-        #     # frame
-        #     cv2.putText(frame, label, (startX, startY - 10),
-        #         cv2.FONT_HERSHEY_SIMPLEX, 0.45, color, 2)
-        #     cv2.rectangle(frame, (startX, startY), (endX, endY), color, 2)
+            # display the label and bounding box rectangle on the output
+            # frame
+            cv2.putText(frame, label, (startX, startY - 10),
+                cv2.FONT_HERSHEY_SIMPLEX, 0.45, color, 2)
+            cv2.rectangle(frame, (startX, startY), (endX, endY), color, 2)
 
-        # ####################################### NEW
+        ####################################### NEW
 
-        # if i == 2:
-        #     if allMask == True:
-        #         rpi_data.append(1)
-        #         maskcount = maskcount + 1
-        #     else:
-        #         rpi_data.append(0)
-        #         nomaskcount = nomaskcount + 1
-        #     i = 0
+        if i == 2:
+            if allMask == True:
+                rpi_data.append(1)
+                maskcount = maskcount + 1
+            else:
+                rpi_data.append(0)
+                nomaskcount = nomaskcount + 1
+            i = 0
 
-        # i = i+1
+        i = i+1
 
-        # if len(rpi_data) == 5:
-        #     print(rpi_data) #included this to make sure logic works
+        if len(rpi_data) == 5:
+            print(rpi_data) #included this to make sure logic works
 
-        #     # stop the timer and display FPS information
-        #     fps.stop()
-        #     print("[INFO] elasped time: {:.2f}".format(fps.elapsed()))
-        #     print("[INFO] approx. FPS: {:.2f}".format(fps.fps()))
-        #     if maskcount > nomaskcount:
-        #         print("Mask")
-        #         # send_data("Mask")
-        #     else:
-        #         print("No Mask")
-        #         # send_data("No Mask")
-        #     maskcount = 0
-        #     nomaskcount = 0
-        #     rpi_data.clear()
-        #     flag = 0
-        #     break
+            # stop the timer and display FPS information
+            fps.stop()
+            print("[INFO] elasped time: {:.2f}".format(fps.elapsed()))
+            print("[INFO] approx. FPS: {:.2f}".format(fps.fps()))
+            if maskcount > nomaskcount:
+                print("Mask")
+                # send_data("Mask")
+            else:
+                print("No Mask")
+                # send_data("No Mask")
+            maskcount = 0
+            nomaskcount = 0
+            rpi_data.clear()
+            flag = 0
+            break
             
 
         ##########################################
