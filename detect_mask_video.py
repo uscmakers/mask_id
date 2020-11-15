@@ -185,6 +185,8 @@ while True:
         # frame = putIterationsPerSec(frame, cps.countsPerSec())
         video_shower.frame = frame
         
+        key = cv2.waitKey(1) & 0xFF
+
         # update the FPS counter
         fps.update()
 
