@@ -161,7 +161,7 @@ nomaskcount = 0
 # created a *threaded *video stream, allow the camera sensor to warmup,
 # and start the FPS counter
 print("[INFO] sampling THREADED frames from `picamera` module...")
-video_getter = VideoGet(source).start()
+video_getter = VideoGet(0).start()
 video_shower = VideoShow(video_getter.frame).start()
     
 while True:
