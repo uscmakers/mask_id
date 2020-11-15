@@ -5,6 +5,7 @@
 from tensorflow.keras.applications.mobilenet_v2 import preprocess_input
 from tensorflow.keras.preprocessing.image import img_to_array
 from tensorflow.keras.models import load_model
+from imutils.video.pivideostream import PiVideoStream
 from imutils.video import VideoStream
 from imutils.video import FPS
 import numpy as np
@@ -14,6 +15,7 @@ import time
 import cv2
 import os
 import socket
+import threading as Thread
 
 from picamera.array import PiRGBArray
 from picamera import PiCamera
@@ -41,7 +43,7 @@ class PiVideoStream:
 		self.frame = None
 		self.stopped = False
     
-    def start(self):
+	def start(self):
 		# start the thread to read frames from the video stream
 		Thread(target=self.update, args=()).start()
 		return self
@@ -61,7 +63,7 @@ class PiVideoStream:
 				self.camera.close()
 				return
     
-    def read(self):
+	def read(self):
 		# return the frame most recently read
 		return self.frame
 
