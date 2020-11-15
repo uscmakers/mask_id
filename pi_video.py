@@ -24,7 +24,7 @@ class VideoShow:
         self.stopped = True
 
 class VideoGet:
-	"""
+    """
     Class that continuously gets frames from a VideoCapture object
     with a dedicated thread.
     """
@@ -34,7 +34,7 @@ class VideoGet:
         (self.grabbed, self.frame) = self.stream.read()
         self.stopped = False
 
-	def start(self):    
+    def start(self):    
         Thread(target=self.get, args=()).start()
         return self
 
