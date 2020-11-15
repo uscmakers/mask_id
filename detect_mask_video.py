@@ -5,7 +5,7 @@
 from tensorflow.keras.applications.mobilenet_v2 import preprocess_input
 from tensorflow.keras.preprocessing.image import img_to_array
 from tensorflow.keras.models import load_model
-from imutils.video import VideoStream
+from imutils.video.pivideostream import PiVideoStream
 from imutils.video import FPS
 from pi_video import VideoGetAndShow
 import numpy as np
@@ -18,7 +18,6 @@ import socket
 import threading as Thread
 
 from picamera.array import PiRGBArray
-from picamera import PiCamera
 
 import RPi.GPIO as GPIO  
 
@@ -153,26 +152,23 @@ nomaskcount = 0
 
 # initialize the video stream and allow the camera sensor to warm up
 # print("[INFO] starting video stream...")
-#             # vs = VideoStream(src=0).start()
-#             # time.sleep(2.0)
-# camera = PiCamera()
-# camera.resolution = (640, 480)
-# camera.framerate = 32
+            # vs = VideoStream(src=0).start()
+            # time.sleep(2.0)
+
 # time.sleep(2.0)
             # grab the frame from the threaded video stream and resize it
             # to have a maximum width of 400 pixels
-            #frame = vs.read()
+            # frame = vs.read()
 
 # created a *threaded *video stream, allow the camera sensor to warmup,
 # and start the FPS counter
 print("[INFO] sampling THREADED frames from `picamera` module...")
-video_getter_shower = VideoGetAndShow(None, 0).start()
+video_getter_shower = PiVideoStream().start()
     
 while True:
     # loop over the frames from the video stream
     if video_getter_shower.stopped:
-        video_shower.stop()
-        video_getter.stop()
+        video_getter_shower.stop();
         break
 
     if GPIO.input(23) == GPIO.LOW:
@@ -182,9 +178,9 @@ while True:
         time.sleep(1)
 
     while flag:
-        frame = video_getter_shower.frame
+        frame = video_getter_shower.read()
 
-        key = cv2.waitKey(1) & 0xFF
+        # key = cv2.waitKey(1) & 0xFF
 
         # update the FPS counter
         fps.update()
