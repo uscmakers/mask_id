@@ -1,50 +1,29 @@
 from threading import Thread
 import cv2
-import imutils
 
-class VideoShow:
+class VideoGetAndShow:
     """
-    Class that continuously shows a frame using a dedicated thread.
+    Class that continuously gets and shows a frame using a dedicated thread.
     """
 
-    def __init__(self, frame=None):
+    def __init__(self, frame=None, src=0):
+        self.stream = cv2.VideoCapture(src)
+        (self.grabbed, self.frame) = self.stream.read()
+        self.stopped = False
         self.frame = frame
         self.stopped = False
 
     def start(self):
-        Thread(target=self.show, args=()).start()
+        Thread(target=self.getAndShow, args=()).start()
         return self
 
-    def show(self):
-        while not self.stopped:
-            cv2.imshow("Video", self.frame)
-            if cv2.waitKey(1) == ord("q"):
-                self.stopped = True
-
-    def stop(self):
-        self.stopped = True
-
-class VideoGet:
-    """
-    Class that continuously gets frames from a VideoCapture object
-    with a dedicated thread.
-    """
-
-    def __init__(self, src=0):
-        self.stream = cv2.VideoCapture(src)
-        (self.grabbed, self.frame) = self.stream.read()
-        self.stopped = False
-
-    def start(self):    
-        Thread(target=self.get, args=()).start()
-        return self
-
-    def get(self):
+    def getAndShow(self):
         while not self.stopped:
             if not self.grabbed:
                 self.stop()
             else:
                 (self.grabbed, self.frame) = self.stream.read()
+                cv2.imshow("Video", self.frame)
 
     def stop(self):
         self.stopped = True
