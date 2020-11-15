@@ -184,7 +184,6 @@ while True:
         
         # update the FPS counter
         fps.update()
-        rawCapture = PiRGBArray(camera)
 
         #################################### NEW
         allMask = True
@@ -258,8 +257,6 @@ while True:
         # show the output frame
         cv2.imshow("Frame", frame)
         key = cv2.waitKey(1) & 0xFF
-
-        rawCapture.truncate(0)
 
         # if the `q` key was pressed, break from the loop
         if key == ord("q"):
