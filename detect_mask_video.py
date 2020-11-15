@@ -7,7 +7,9 @@ from tensorflow.keras.preprocessing.image import img_to_array
 from tensorflow.keras.models import load_model
 from imutils.video.pivideostream import PiVideoStream
 from imutils.video import FPS
-from pi_video import VideoGetAndShow
+from pi_video import VideoGet
+from pi_video import VideoShow
+from pi_video import getFrame
 import numpy as np
 import argparse
 import imutils
@@ -163,12 +165,14 @@ nomaskcount = 0
 # created a *threaded *video stream, allow the camera sensor to warmup,
 # and start the FPS counter
 print("[INFO] sampling THREADED frames from `picamera` module...")
-video_getter_shower = PiVideoStream().start()
+video_getter = VideoGet(0).start()
+video_shower = VideoShow(video_getter.frame).start()
     
 while True:
     # loop over the frames from the video stream
-    if video_getter_shower.stopped:
-        video_getter_shower.stop();
+    if video_getter.stopped or video_shower.stopped:
+        video_shower.stop()
+        video_getter.stop()
         break
 
     if GPIO.input(23) == GPIO.LOW:
@@ -178,7 +182,7 @@ while True:
         time.sleep(1)
 
     while flag:
-        frame = video_getter_shower.read()
+        frame = getFrame()
 
         # key = cv2.waitKey(1) & 0xFF
 

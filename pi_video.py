@@ -1,82 +1,53 @@
 from threading import Thread
 import cv2
-from imutils.video import VideoStream
-from picamera import PiCamera
 
-# import the necessary packages
-from picamera.array import PiRGBArray
-from picamera import PiCamera
-from threading import Thread
-import cv2
+frame = None
 
-class PiVideoStream:
-    def __init__(self, resolution=(320, 240), framerate=32):
-        # initialize the camera and stream
-        self.camera = PiCamera()
-        self.camera.resolution = resolution
-        self.camera.framerate = framerate
-        self.rawCapture = PiRGBArray(self.camera, size=resolution)
-        self.stream = self.camera.capture_continuous(self.rawCapture,
-            format="bgr", use_video_port=True)
-        # initialize the frame and the variable used to indicate
-        # if the thread should be stopped
-        self.frame = None
+class VideoShow:
+    """
+    Class that continuously shows a frame using a dedicated thread.
+    """
+
+    def __init__(self):
         self.stopped = False
 
-        def start(self):
-        # start the thread to read frames from the video stream
-        Thread(target=self.update, args=()).start()
+    def start(self):
+        Thread(target=self.show, args=()).start()
         return self
 
-    def update(self):
-        # keep looping infinitely until the thread is stopped
-        for f in self.stream:
-            # grab the frame from the stream and clear the stream in
-            # preparation for the next frame
-            self.frame = f.array
-            self.rawCapture.truncate(0)
-                        cv2.imshow("Video", self.frame)
-
-            # if the thread indicator variable is set, stop the thread
-            # and resource camera resources
-            if self.stopped:
-                self.stream.close()
-                self.rawCapture.close()
-                self.camera.close()
-                return
-    
-        def read(self):
-        # return the frame most recently read
-        return self.frame
+    def show(self):
+        while not self.stopped and frame is not None:
+            cv2.imshow("Video", frame)
+            if cv2.waitKey(1) == ord("q"):
+                self.stopped = True
 
     def stop(self):
-        # indicate that the thread should be stopped
         self.stopped = True
 
-# class VideoGetAndShow:
-#     """
-#     Class that continuously gets and shows a frame using a dedicated thread.
-#     """
+class VideoGet:
+    """
+    Class that continuously gets frames from a VideoCapture object
+    with a dedicated thread.
+    """
 
-#     def __init__(self, frame=None, src=0):
-#         self.stream = cv2.VideoCapture(src)
-#         (self.grabbed, self.frame) = self.stream.read()
-#         self.stopped = False
-#         self.frame = frame
-#         self.stopped = False
+    def __init__(self, src=0):
+        self.stream = cv2.VideoCapture(src)
+        (self.grabbed, self.frame) = self.stream.read()
+        self.stopped = False
 
-#     def start(self):
-#         Thread(target=self.getAndShow, args=()).start()
-#         return self
+    def start(self):    
+        Thread(target=self.get, args=()).start()
+        return self
 
-#     def getAndShow(self):
-#         while not self.stopped:
-#             if not self.grabbed:
-#                 self.stop()
-#             else:
-#                 (self.grabbed, self.frame) = self.stream.read()
-#                 if self.grabbed:
-#                     cv2.imshow("Video", self.frame)
+    def get(self):
+        while not self.stopped:
+            if not self.grabbed:
+                self.stop()
+            else:
+                (self.grabbed, frame) = self.stream.read()
 
-#     def stop(self):
-#         self.stopped = True
+    def stop(self):
+        self.stopped = True
+
+def getFrame():
+    return frame
