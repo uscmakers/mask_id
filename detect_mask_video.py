@@ -123,9 +123,9 @@ ap.add_argument("-m", "--model", type=str,
 ap.add_argument("-c", "--confidence", type=float, default=0.5,
     help="minimum probability to filter weak detections")
 ap.add_argument("-n", "--num-frames", type=int, default=100,
-	help="# of frames to loop over for FPS test")
+    help="# of frames to loop over for FPS test")
 ap.add_argument("-d", "--display", type=int, default=-1,
-	help="Whether or not frames should be displayed")
+    help="Whether or not frames should be displayed")
 args = vars(ap.parse_args())
 
 # # load our serialized face detector model from disk
@@ -165,7 +165,7 @@ args = vars(ap.parse_args())
 # and start the FPS counter
 print("[INFO] sampling THREADED frames from `picamera` module...")
 vs = PiVideoStream().start()
-	
+    
 while True:
     # loop over the frames from the video stream
     if GPIO.input(23) == GPIO.LOW:
@@ -176,11 +176,11 @@ while True:
 
     while flag:
         frame = vs.read()
-	    frame = imutils.resize(frame, width=400)
+        frame = imutils.resize(frame, width=400)
 
         # display frame to our screen
-		cv2.imshow("Frame", frame)
-		key = cv2.waitKey(1) & 0xFF
+        cv2.imshow("Frame", frame)
+        key = cv2.waitKey(1) & 0xFF
         
         # update the FPS counter
         fps.update()
