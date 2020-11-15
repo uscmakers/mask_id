@@ -6,8 +6,7 @@ from tensorflow.keras.applications.mobilenet_v2 import preprocess_input
 from tensorflow.keras.preprocessing.image import img_to_array
 from tensorflow.keras.models import load_model
 from imutils.video import FPS
-from pi_video import VideoGet
-from pi_video import VideoShow
+from pi_video import VideoGetAndShow
 import numpy as np
 import argparse
 import imutils
