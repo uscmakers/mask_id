@@ -98,6 +98,11 @@ ap.add_argument("-m", "--model", type=str,
     help="path to trained face mask detector model")
 ap.add_argument("-c", "--confidence", type=float, default=0.5,
     help="minimum probability to filter weak detections")
+ap.add_argument("-n", "--num-frames", type=int, default=100,
+    help="# of frames to loop over for FPS test")
+ap.add_argument("-d", "--display", type=int, default=-1,
+    help="Whether or not frames should be displayed")
+args = vars(ap.parse_args())
 
 print("[INFO] loading face detector model...")
 prototxtPath = os.path.sep.join([args["face"], "deploy.prototxt"])
