@@ -23,8 +23,9 @@ class VideoGetAndShow:
                 self.stop()
             else:
                 (self.grabbed, self.frame) = self.stream.read()
-                if (self.grabbed):
-                    cv2.imshow("Video", self.frame)
+                print(self.grabbed)
+                # if (self.grabbed):
+                    # cv2.imshow("Video", self.frame)
 
     def stop(self):
         self.stopped = True
