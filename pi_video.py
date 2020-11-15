@@ -1,14 +1,14 @@
 from threading import Thread
 import cv2
-
-frame = None
+import imutils
 
 class VideoShow:
     """
     Class that continuously shows a frame using a dedicated thread.
     """
 
-    def __init__(self):
+    def __init__(self, frame=None):
+        self.frame = frame
         self.stopped = False
 
     def start(self):
@@ -16,8 +16,8 @@ class VideoShow:
         return self
 
     def show(self):
-        while not self.stopped and frame is not None:
-            cv2.imshow("Video", frame)
+        while not self.stopped:
+            cv2.imshow("Video", self.frame)
             if cv2.waitKey(1) == ord("q"):
                 self.stopped = True
 
@@ -32,7 +32,8 @@ class VideoGet:
 
     def __init__(self, src=0):
         self.stream = cv2.VideoCapture(src)
-        (self.grabbed, self.frame) = self.stream.read()
+    	(self.grabbed, self.frame) = self.stream.read()
+		self.frame = imutils.resize(self.frame, width=400)
         self.stopped = False
 
     def start(self):    
@@ -44,10 +45,8 @@ class VideoGet:
             if not self.grabbed:
                 self.stop()
             else:
-                (self.grabbed, frame) = self.stream.read()
+                (self.grabbed, self.frame) = self.stream.read()
+				self.frame = imutils.resize(self.frame, width=400)
 
     def stop(self):
         self.stopped = True
-
-def getFrame():
-    return frame
