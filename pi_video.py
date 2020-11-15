@@ -57,8 +57,9 @@ class VideoGetAndShow:
 
     def __init__(self):
         self.video_getter = VideoGet(0).start()
-        self.video_shower = VideoShower(self.video_getter.frame).start()
+        self.video_shower = VideoShow(self.video_getter.frame).start()
         self.frame = self.video_getter.frame
+        self.stopped = False
 
     def start(self):    
         Thread(target=self.getAndShow, args=()).start()
@@ -68,10 +69,10 @@ class VideoGetAndShow:
         while not self.stopped:
             self.frame = self.video_getter.frame
             # frame = putIterationsPerSec(frame, cps.countsPerSec())
-            self.video_shower.frame = frame
+            self.video_shower.frame = self.frame
 
     def getFrame(self):
-        return frame
+        return self.frame
 
     def stop(self):
         self.stopped = True

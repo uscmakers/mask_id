@@ -6,8 +6,7 @@ from tensorflow.keras.applications.mobilenet_v2 import preprocess_input
 from tensorflow.keras.preprocessing.image import img_to_array
 from tensorflow.keras.models import load_model
 from imutils.video import FPS
-from pi_video import VideoGet
-from pi_video import VideoShow
+from pi_video import VideoGetAndShow
 import numpy as np
 import argparse
 import imutils
@@ -132,15 +131,15 @@ ap.add_argument("-d", "--display", type=int, default=-1,
 args = vars(ap.parse_args())
 
 # # load our serialized face detector model from disk
-# print("[INFO] loading face detector model...")
-# prototxtPath = os.path.sep.join([args["face"], "deploy.prototxt"])
-# weightsPath = os.path.sep.join([args["face"],
-#     "res10_300x300_ssd_iter_140000.caffemodel"])
-# faceNet = cv2.dnn.readNet(prototxtPath, weightsPath)
+print("[INFO] loading face detector model...")
+prototxtPath = os.path.sep.join([args["face"], "deploy.prototxt"])
+weightsPath = os.path.sep.join([args["face"],
+     "res10_300x300_ssd_iter_140000.caffemodel"])
+faceNet = cv2.dnn.readNet(prototxtPath, weightsPath)
 
 # # # load the face mask detector model from disk
-# print("[INFO] loading face mask detector model...")
-# maskNet = load_model(args["model"])
+print("[INFO] loading face mask detector model...")
+maskNet = load_model(args["model"])
 
 i = 0
 rpi_data = []
