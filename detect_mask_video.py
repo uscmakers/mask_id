@@ -165,7 +165,7 @@ nomaskcount = 0
 # and start the FPS counter
 print("[INFO] sampling THREADED frames from `picamera` module...")
 video_getter = VideoGet(0).start()
-video_shower = VideoShow(video_getter.frame).start()
+video_shower = VideoShow().start()
     
 while True:
     # loop over the frames from the video stream
