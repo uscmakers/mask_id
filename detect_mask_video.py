@@ -5,11 +5,14 @@
 from tensorflow.keras.applications.mobilenet_v2 import preprocess_input
 from tensorflow.keras.preprocessing.image import img_to_array
 from tensorflow.keras.models import load_model
-from imutils.video.pivideostream import PiVideoStream
 from imutils.video import FPS
+<<<<<<< HEAD
 from pi_video import VideoGet
 from pi_video import VideoShow
 from pi_video import getFrame
+=======
+from pi_video import PiVideoStream
+>>>>>>> 409f77b7bdc822da35bd6201889fec63a7d2b8d1
 import numpy as np
 import argparse
 import imutils
