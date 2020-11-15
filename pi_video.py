@@ -32,7 +32,7 @@ class VideoGet:
     def __init__(self, src=0):
         self.stream = cv2.VideoCapture(src)
         (self.grabbed, self.frame) = self.stream.read()
-		self.frame = imutils.resize(self.frame, width=400)
+        self.frame = imutils.resize(self.frame, width=400)
         self.stopped = False
 
     def start(self):    
