@@ -31,6 +31,7 @@ GPIO.setmode(GPIO.BCM)
 GPIO.setup(23, GPIO.IN, pull_up_down=GPIO.PUD_UP)  
 
 def detect_and_predict_mask(frame, faceNet, maskNet):
+    start = time.time()
     # grab the dimensions of the frame and then construct a blob
     # from it
     (h, w) = frame.shape[:2]
@@ -89,6 +90,8 @@ def detect_and_predict_mask(frame, faceNet, maskNet):
 
     # return a 2-tuple of the face locations and their corresponding
     # locations
+    end = time.time()
+    print(f"Runtime of the detect and mask prediction is {end - start}")
     return (locs, preds)
 
 # def send_data(data):
@@ -215,9 +218,9 @@ while True:
 
             # display the label and bounding box rectangle on the output
             # frame
-            # cv2.putText(frame, label, (startX, startY - 10),
-            #     cv2.FONT_HERSHEY_SIMPLEX, 0.45, color, 2)
-            # cv2.rectangle(frame, (startX, startY), (endX, endY), color, 2)
+            cv2.putText(frame, label, (startX, startY - 10),
+                cv2.FONT_HERSHEY_SIMPLEX, 0.45, color, 2)
+            cv2.rectangle(frame, (startX, startY), (endX, endY), color, 2)
 
         ####################################### NEW
 
