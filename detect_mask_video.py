@@ -30,6 +30,7 @@ GPIO.setmode(GPIO.BCM)
 GPIO.setup(23, GPIO.IN, pull_up_down=GPIO.PUD_UP)
 
 def detect_and_predict_mask(frame, faceNet, maskNet):
+    start = time.time()
     # grab the dimensions of the frame and then construct a blob
     # from it
     (h, w) = frame.shape[:2]
@@ -85,6 +86,9 @@ def detect_and_predict_mask(frame, faceNet, maskNet):
         # in the above `for` loop
         faces = np.array(faces, dtype="float32")
         preds = maskNet.predict(faces, batch_size=32)
+
+    end = time.time()
+    print(f"Runtime of the detect and mask prediction is {end - start}")
 
     # return a 2-tuple of the face locations and their corresponding
     # locations
