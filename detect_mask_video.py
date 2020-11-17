@@ -209,7 +209,6 @@ try:
                 # stop the timer and display FPS information
                 fps.stop()
                 print("[INFO] elasped time: {:.2f}".format(fps.elapsed()))
-                print("[INFO] approx. FPS: {:.2f}".format(fps.fps()))
                 if maskcount > nomaskcount:
                     print("Mask detected")
                     client.send("MASK".encode('utf-8'))
