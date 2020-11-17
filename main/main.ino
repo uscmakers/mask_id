@@ -79,12 +79,14 @@ void wifiLoop() {
   delay(1000);
   if (message  == "MASK"){
     mask_flag = 1;
+    //message = "";
     //Serial.println(message);
     delay(2000);
     
   }
   else if(message == "NO MASK"){
     mask_flag = 0;
+    message = "";
     //Serial.println(message);
     delay(2000);
   }
@@ -121,26 +123,26 @@ void servoLoop() {
   if (mask_flag == 1 && lock_flag == 1 && prox == LOW){
     Serial.println("mask on");
     Serial.println("unlock door");
-    for(angle = 85; angle >= 0; angle--) {                                  
+    for(angle = 85; angle >= 3; angle--) {                                  
         servo.write(angle);               
-        delay(15);                   
+        delay(25);                   
     }
     lock_flag = 0;
     mask_flag = 0;
     message = "";
-    delay(5000);
+    delay(2500);
   }
   // check if the door is unlocked and door is closed, then lock the lock
   else if(lock_flag == 0 && prox == LOW){
     // now scan back from 80 to 0 degrees
     Serial.println("lock door ");
-    for(angle = 0; angle <= 85; angle++){                                
+    for(angle = 3; angle <= 85; angle++){                                
       servo.write(angle);           
-      delay(15);       
+      delay(25);       
     }
     //maybe add alarm if door is left open 
     lock_flag =1;
-    delay(2000);
+    delay(2500);
   }
   
 }
