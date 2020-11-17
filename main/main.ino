@@ -13,7 +13,7 @@ char pass[] = "strongcar994"; // your network password (use for WPA, or use as k
 
 // Replace host and port with host and port of RPi
 const char * host = "192.168.1.219";
-const uint16_t port = 5007;
+const uint16_t port = 5008;
 String message = "";
 int status = WL_IDLE_STATUS;
 const int LED_PIN = 8;  //Pin LED
